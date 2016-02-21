@@ -43,6 +43,11 @@ int main() {
         nlBegin(NL_ROW); // ui = 0, soft
         nlCoefficient(i*2+1, 1);
         nlEnd(NL_ROW);
+
+        nlBegin(NL_ROW); // xi = xN, soft
+        nlCoefficient(i*2, 1);
+        nlRightHandSide(xN);
+        nlEnd(NL_ROW);
     }
 
     nlEnd(NL_MATRIX);

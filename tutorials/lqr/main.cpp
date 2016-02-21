@@ -84,13 +84,40 @@ int main() {
 
     nlDeleteContext(nlGetCurrent());
 
+    nlNewContext();
+    nlSolverParameteri(NL_NB_VARIABLES, 2);
+    nlSolverParameteri(NL_LEAST_SQUARES, NL_TRUE);
+    nlBegin(NL_SYSTEM);
+    nlBegin(NL_MATRIX);
+
     for (int i=0; i<N; i++) {
-        for (int j=0; j<3; j++) {
-            std::cout << solution[i*3+j] << " ";
-        }
-        std::cout << std::endl;
+        nlBegin(NL_ROW);
+        nlCoefficient(0, solution[i*3  ]);
+        nlCoefficient(1, solution[i*3+1]);
+        nlRightHandSide(solution[i*3+2]);
+        nlEnd(NL_ROW);
     }
 
+    nlEnd(NL_MATRIX);
+    nlEnd(NL_SYSTEM);
+    nlSolve();
+    double a = nlGetVariable(0);
+    double b = nlGetVariable(1);
+
+//    double a = -0.0513868, b = -0.347324;
+
+    std::cerr << a << " " << b << std::endl;
+
+    double xi = x0;
+    double vi = v0;
+    for (int i=0; i<N; i++) {
+        double ui = xi*a + vi*b;
+        xi = xi + vi;
+        vi = vi + ui;
+        std::cout << (ui-solution[i*3+2]) << std::endl;
+    }
+
+    nlDeleteContext(nlGetCurrent());
     return 0;
 }
 

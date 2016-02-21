@@ -40,9 +40,8 @@ int main() {
     }
 
     for (int i=0; i<N; i++) {
-        nlBegin(NL_ROW); // xi = xN, soft
-        nlCoefficient(i*2, 1);
-        nlRightHandSide(xN);
+        nlBegin(NL_ROW); // ui = 0, soft
+        nlCoefficient(i*2+1, 1);
         nlEnd(NL_ROW);
     }
 

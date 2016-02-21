@@ -4,8 +4,8 @@
 
 int main() {
     const int N = 60;
-    const double x0 = 3.1;
-    const double v0 = .5;
+    const double x0 = 9.1;
+    const double v0 = -2.5;
     const double hard_penalty = 100.;
     const double rho = 16.;
 
@@ -84,27 +84,7 @@ int main() {
 
     nlDeleteContext(nlGetCurrent());
 
-    nlNewContext();
-    nlSolverParameteri(NL_NB_VARIABLES, 2);
-    nlSolverParameteri(NL_LEAST_SQUARES, NL_TRUE);
-    nlBegin(NL_SYSTEM);
-    nlBegin(NL_MATRIX);
-
-    for (int i=0; i<N; i++) {
-        nlBegin(NL_ROW);
-        nlCoefficient(0, solution[i*3  ]);
-        nlCoefficient(1, solution[i*3+1]);
-        nlRightHandSide(solution[i*3+2]);
-        nlEnd(NL_ROW);
-    }
-
-    nlEnd(NL_MATRIX);
-    nlEnd(NL_SYSTEM);
-    nlSolve();
-    double a = nlGetVariable(0);
-    double b = nlGetVariable(1);
-
-//    double a = -0.0513868, b = -0.347324;
+     double a = -0.0513868, b = -0.347324;
 
     std::cerr << a << " " << b << std::endl;
 
@@ -117,7 +97,6 @@ int main() {
         std::cout << (ui-solution[i*3+2]) << std::endl;
     }
 
-    nlDeleteContext(nlGetCurrent());
     return 0;
 }
 

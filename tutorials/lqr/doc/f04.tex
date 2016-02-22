@@ -5,8 +5,8 @@
 
 \begin{align*}
 J(\vec{u}) & = \sum\limits_{i=0}^N \left((x_0-x_N)^2 + 2(x_0-x_N)\sum\limits_{j=0}^{i-1}u_j+\left(\sum\limits_{j=0}^{i-1}u_j\right)^2 + u_i^2\right)\\
-& = u_0^2 + 2(x_n-x_N)\sum\limits_{i=0}^N u_0 +  \sum\limits_{i=0}^N u_0^2 + u_0 \sum\limits_{i=0}^N \sum\limits_{j=0}^{i-1}u_j + \dots\\
-& = u_0^2 + 2N(x_n-x_N) u_0 + N u_0^2 +  u_0  \sum\limits_{i=0}^N \sum\limits_{j=0}^{i-1}u_j + \dots
+& = u_0^2 + 2(x_0-x_N)\sum\limits_{i=0}^N u_0 +  2\sum\limits_{i=0}^N u_0^2 + u_0 \sum\limits_{i=0}^N \sum\limits_{j=1}^{i-1}u_j + \dots\\
+& = u_0^2 + 2N(x_0-x_N) u_0 + N u_0^2 +  u_0  2\sum\limits_{i=0}^N \sum\limits_{j=1}^{i-1}u_j + \dots
 \end{align*}
 \end{document}
 

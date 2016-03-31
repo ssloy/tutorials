@@ -13,24 +13,31 @@ int main() {
 	}
 	w0 /= N-N/2;
 
-	double best_alpha  = 1;
+	double best_a,best_b;
 	double best_energy = std::numeric_limits<double>::max();
 
-	for (double alpha=-.01; alpha>-2; alpha -= .0001) {
-		double energy = 0;
-		for (int i=0; i<N; i++) {
-			energy += pow(w0*(1.-exp(alpha*i)) - w[i] ,2);
+	for (double a=1; a>0; a-=.1) {
+		for (double b=-100; b<100; b+=.1) {
+			double energy = 0;
+			double w2 = w[0];
+			for (int i=1; i<N-1; i++) {
+				energy += pow(w2 - w[i] ,2);
+				w2 = a*w2 + b;
+			}
+			if (best_energy>energy) {
+				best_a = a;
+				best_b = b;
+				best_energy = energy;
+			}
+			//		std::cout << alpha << " " << energy << std::endl;
 		}
-		if (best_energy>energy) {
-			best_alpha  = alpha;
-			best_energy = energy;
-		}
-//		std::cout << alpha << " " << energy << std::endl;
 	}
-	std::cerr << w0 << " " << best_alpha << std::endl;
+	std::cerr << best_a << " " << best_b << std::endl;
 
+	double w2 = w[0];
 	for (int i=0; i<N; i++) {
-		std::cout << i << " " << w[i] << " " << w0*(1.-exp(best_alpha*i)) << std::endl;
+		std::cout << i << " " << w[i] << " " << w2 << std::endl;
+		w2 = w2*best_a + best_b;
 	}
 
 	return 0;

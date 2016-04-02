@@ -9,19 +9,17 @@ const double w[4][600] = {{1,7,29,40,40,36,33,36,39,50,50,47,45,53,57,59,61,59,6
 const double u[4] = {24, 18.45, 12.05, 6.02};
 const int cnt[4] = {253, 320, 495, 599};
 
-//0.98 0.157
-
 int main() {
-	double best_a,best_b;
-	double best_energy = std::numeric_limits<double>::max();
+    double best_a,best_b;
+    double best_energy = std::numeric_limits<double>::max();
 
     for (double a=1; a>0; a-=.01) {
         for (double b=0; b<10; b+=.001) {
             double energy = 0;
             for (int m=0; m<4; m++) {
                 double w2 = w[m][0];
-                for (int i=1; i<cnt[m]-1; i++) {
-                    energy += pow(w2-w[m][i], 2);
+                for (int i=1; i<cnt[0]-1; i++) {
+                    energy += pow(w2-w[m][i], 2)/(u[m]*u[m]);
                     w2 = a*w2 + b*u[m];
                 }
             }
@@ -32,27 +30,19 @@ int main() {
             }
         }
     }
-	std::cerr << best_a << " " << best_b << std::endl;
+    std::cerr << best_a << " " << best_b << std::endl;
 
     double w2[4] = {w[0][0],w[1][0],w[2][0],w[3][0]};
-	for (int i=0; i<599; i++) {
-        std::cout << i << " ";
+    for (int i=0; i<cnt[0]; i++) {
+        std::cout << i*2 << " ";
         for (int m=0; m<4; m++) {
-            if (i>=cnt[m]) {
-                std::cout << w[m][cnt[m]-1];
-            } else {
-                std::cout << w[m][i];
-            }
-            std::cout << " " << w2[m] << " ";
+            std::cout << w[m][i]/2*10 << " " << w2[m]/2*10 << " ";
             w2[m] = w2[m]*best_a + best_b*u[m];
         }
         std::cout << std::endl;
-	}
+    }
 
-	return 0;
+    return 0;
 }
-
-
-
 
 

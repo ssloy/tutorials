@@ -3,15 +3,14 @@
 #include "OpenNL_psm.h"
 
 int main() {
-    const int N = 2500;
-    const double x0 = 500;
-    const double v0 = 180;
-    const double hard_penalty = 100.;
+    const int N = 2500; // 5 seconds
+
+    const double x0 = 245; // 245 mm from the goal
+    const double v0 = 0;   // zero initial speed
 
     nlNewContext();
     nlSolverParameteri(NL_NB_VARIABLES, N*3);
     nlSolverParameteri(NL_LEAST_SQUARES, NL_TRUE);
-            nlSolverParameteri(NL_PRECONDITIONER, NL_PRECOND_SSOR);
 
     nlBegin(NL_SYSTEM);
 
@@ -33,18 +32,23 @@ int main() {
     nlBegin(NL_MATRIX);
 
     for (int i=0; i<N-1; i++) {
-        nlRowScaling(hard_penalty);
-        nlBegin(NL_ROW); // x{N+1} = xN + vN
-        nlCoefficient((i+1)*3  , -1);
-        nlCoefficient((i  )*3  ,  1);
-        nlCoefficient((i  )*3+1,  .01);
+        nlRowScaling(1000);
+        nlBegin(NL_ROW); // x{i+1} = xi + vi
+        nlCoefficient((i+1)*3  ,  -1);
+        nlCoefficient((i  )*3  ,   1);
+        // well, on microcontroller side the position will be measured in encoder ticks and not in mm
+        // the cart moves for 1 mm per 100 encoder ticks
+        // for computational stability reasons the position in this program is given in mm and not in ticks,
+        // therefore the equation i am solving here is x{i+1} = xi + .01 vi,
+        // since the speed is still in ticks / dt
+        nlCoefficient((i  )*3+1, .01);
         nlEnd(NL_ROW);
 
-        nlRowScaling(hard_penalty);
-        nlBegin(NL_ROW); // v{N+1} = vN + uN
+        nlRowScaling(1000);
+        nlBegin(NL_ROW); // v{i+1} = .97 vi + .218 ui
         nlCoefficient((i+1)*3+1, -1);
-        nlCoefficient((i  )*3+1,  .98);
-        nlCoefficient((i  )*3+2,  .157);
+        nlCoefficient((i  )*3+1,  .97);
+        nlCoefficient((i  )*3+2,  .218);
         nlEnd(NL_ROW);
     }
 
@@ -52,7 +56,6 @@ int main() {
         nlRowScaling(1);
         nlBegin(NL_ROW); // xi = 0, soft
         nlCoefficient(i*3, 1);
-//        nlScaleRow(1);
         nlEnd(NL_ROW);
 
         nlRowScaling(1);
@@ -75,21 +78,14 @@ int main() {
         solution.push_back(nlGetVariable(i));
     }
 
-
-
-/*
     for (int i=0; i<N; i++) {
-        for (int j=0; j<3; j++) {
-            std::cout << solution[i*3+j] << " ";
-        }
-        std::cout << std::endl;
+        std::cout << i*2 << " " << solution[i*3] << " " << solution[i*3+1]/2*10 << " " << solution[i*3+2] << std::endl;
     }
-*/
-
 
 
     nlDeleteContext(nlGetCurrent());
 
+    // Control curves being found, it is time to find static gain matrix
 
     nlNewContext();
     nlSolverParameteri(NL_NB_VARIABLES, 2);
@@ -111,18 +107,9 @@ int main() {
     double a = nlGetVariable(0);
     double b = nlGetVariable(1);
 
-    nlDeleteContext(nlGetCurrent());
-
-
-// -0.0360376 -0.0439987
-
     std::cerr << a << " " << b << std::endl;
 
-    for (int i=0; i<N; i++) {
-        double ui = solution[i*3]*a + solution[i*3+1]*b;
-        std::cout << solution[i*3+2] << " " << ui<< std::endl;
-    }
-
+    nlDeleteContext(nlGetCurrent());
 
     return 0;
 }

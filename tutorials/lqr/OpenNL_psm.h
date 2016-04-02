@@ -314,4 +314,3 @@ extern "C" {
     
 #endif
 
-void nlScaleRow(NLdouble s);

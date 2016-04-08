@@ -21,7 +21,7 @@ int main() {
     nlSetVariable(1, v0);
 
     nlLockVariable(3);
-    nlSetVariable(3, x0);
+    nlSetVariable(3, 0);
 
     nlLockVariable((N-1)*4);
     nlSetVariable((N-1)*4, 0);
@@ -46,7 +46,7 @@ int main() {
         nlBegin(NL_ROW); // v{i+1} = a vi + b ui
         nlCoefficient((i+1)*4+1, -1);
         nlCoefficient((i  )*4+1, 0.974);
-        nlCoefficient((i  )*4+2, 0.111808); // remember that x and v are measured in cm and cm/s
+        nlCoefficient((i  )*4+2, 0.00111808*100); // remember that x and v are measured in cm and cm/s
         nlEnd(NL_ROW);
 
         nlRowScaling(1000);

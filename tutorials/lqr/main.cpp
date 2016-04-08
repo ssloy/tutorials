@@ -5,8 +5,8 @@
 int main() {
     const int N = 2500; // 5 seconds
 
-    const double x0 = 245; // 245 mm from the goal
-    const double v0 = 0;   // zero initial speed
+    const double x0 = 24.5; // 24.5 cm from the goal
+    const double v0 = 0;   // zero initial speed, cm/sec
 
     nlNewContext();
     nlSolverParameteri(NL_NB_VARIABLES, N*3);
@@ -32,28 +32,23 @@ int main() {
     nlBegin(NL_MATRIX);
 
     for (int i=0; i<N-1; i++) {
-        nlRowScaling(1000);
+        nlRowScaling(500);
         nlBegin(NL_ROW); // x{i+1} = xi + vi
-        nlCoefficient((i+1)*3  ,  -1);
-        nlCoefficient((i  )*3  ,   1);
-        // well, on microcontroller side the position will be measured in encoder ticks and not in mm
-        // the cart moves for 1 mm per 100 encoder ticks
-        // for computational stability reasons the position in this program is given in mm and not in ticks,
-        // therefore the equation i am solving here is x{i+1} = xi + .01 vi,
-        // since the speed is still in ticks / dt
-        nlCoefficient((i  )*3+1, .01);
+        nlCoefficient((i+1)*3  ,   -1);
+        nlCoefficient((i  )*3  ,    1);
+        nlCoefficient((i  )*3+1, .002);
         nlEnd(NL_ROW);
 
-        nlRowScaling(1000);
-        nlBegin(NL_ROW); // v{i+1} = .97 vi + .218 ui
+        nlRowScaling(500);
+        nlBegin(NL_ROW); // v{i+1} = a vi + b ui
         nlCoefficient((i+1)*3+1, -1);
-        nlCoefficient((i  )*3+1,  .97);
-        nlCoefficient((i  )*3+2,  .218);
+        nlCoefficient((i  )*3+1, 0.974);
+        nlCoefficient((i  )*3+2, 0.111808); // remember that x and v are measured in cm and cm/s
         nlEnd(NL_ROW);
     }
 
     for (int i=0; i<N; i++) {
-        nlRowScaling(1);
+        nlRowScaling(5);
         nlBegin(NL_ROW); // xi = 0, soft
         nlCoefficient(i*3, 1);
         nlEnd(NL_ROW);
@@ -63,7 +58,7 @@ int main() {
         nlCoefficient(i*3+1, 1);
         nlEnd(NL_ROW);
 
-        nlRowScaling(10);
+        nlRowScaling(3);
         nlBegin(NL_ROW); // ui = 0, soft
         nlCoefficient(i*3+2, 1);
         nlEnd(NL_ROW);
@@ -79,7 +74,7 @@ int main() {
     }
 
     for (int i=0; i<N; i++) {
-        std::cout << i*2 << " " << solution[i*3] << " " << solution[i*3+1]/2*10 << " " << solution[i*3+2] << std::endl;
+        std::cout << i*2 << " " << solution[i*3] << " " << solution[i*3+1] << " " << solution[i*3+2] << std::endl;
     }
 
 
@@ -95,8 +90,8 @@ int main() {
 
     for (int i=0; i<N; i++) {
         nlBegin(NL_ROW);
-        nlCoefficient(0, solution[i*3  ]);
-        nlCoefficient(1, solution[i*3+1]);
+        nlCoefficient(0, solution[i*3  ]/100); // bring position and speed back to m and m/s
+        nlCoefficient(1, solution[i*3+1]/100);
         nlRightHandSide(solution[i*3+2]);
         nlEnd(NL_ROW);
     }

@@ -1,0 +1,15 @@
+\documentclass{article}
+\usepackage{amssymb,amsmath}
+\begin{document}
+\thispagestyle{empty}
+\newcommand{\sign}{\text{sign}}
+
+
+\begin{align}
+v_{k+1}  & = v_k + \Delta t a_k = a~v_k + b~u_k + c~\sign{v_k} \nonumber \\
+\Rightarrow u_k & = \frac{(1-a) v_k - c~\sign{v_k} + \Delta t a_k}{b} \nonumber
+\end{align}
+
+\end{document}
+
+

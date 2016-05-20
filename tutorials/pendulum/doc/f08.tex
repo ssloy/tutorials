@@ -1,0 +1,20 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage[utf8x]{inputenc}
+
+\usepackage[a4paper,body={6.5in, 9.7in}]{geometry}
+\usepackage{amssymb,amsmath}
+
+\newcommand{\sign}{\text{sign}}
+\begin{document}
+
+\thispagestyle{empty}
+\begin{align*}
+I\ddot{\theta} & = lmg\sin(\theta) - lm\cos(\theta)\frac{d^2}{dt^2}(x + l\sin(\theta)) + lm\sin(\theta)\frac{d^2}{dt^2}(l\cos(\theta)) = \\
+               & = lmg\sin(\theta) - lm\cos(\theta)\left(\ddot{x} + l\ddot{\theta}\cos(\theta) - l\left(\dot{\theta}\right)^2\sin(\theta)\right) + lm\sin(\theta)\left(-l\ddot{\theta}\sin(\theta) - l\left(\dot{\theta}\right)^2\cos(\theta) \right) = \\
+               & = lmg\sin(\theta) - lm\cos(\theta)\ddot{x} - l^2m\ddot{\theta}
+\end{align*}
+
+\end{document}
+
+

@@ -56,9 +56,10 @@ for t in time:
     xk = A*xk + B*uk
 
 plt.plot(time, X, label="cart position, meters")
-plt.plot(time, T, label='pendulum angle, radians/second')
+plt.plot(time, T, label='pendulum angle, radians')
 plt.plot(time, U, label='control voltage, decavolts')
 
 plt.legend(loc='upper right')
+plt.grid()
 plt.show()
 

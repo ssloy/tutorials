@@ -9,8 +9,11 @@ int main() {
     const double v0 = 0;   // zero initial speed, cm/sec
 
     nlNewContext();
+//    nlEnable(NL_VERBOSE);
     nlSolverParameteri(NL_NB_VARIABLES, N*4);
     nlSolverParameteri(NL_LEAST_SQUARES, NL_TRUE);
+    nlSolverParameteri(NL_PRECONDITIONER, NL_PRECOND_NONE);
+
 
     nlBegin(NL_SYSTEM);
 
@@ -35,48 +38,50 @@ int main() {
     nlBegin(NL_MATRIX);
 
     for (int i=0; i<N-1; i++) {
-        nlRowScaling(1000);
+        nlRowScaling(500);
         nlBegin(NL_ROW); // x{i+1} = xi + vi
         nlCoefficient((i+1)*4  ,   -1);
         nlCoefficient((i  )*4  ,    1);
         nlCoefficient((i  )*4+1, .002);
         nlEnd(NL_ROW);
 
-        nlRowScaling(1000);
+//vk+1 =  0.978vk + 0.0946242uk - sgn(vk) 0.0920184
+
+        nlRowScaling(500);
         nlBegin(NL_ROW); // v{i+1} = a vi + b ui
         nlCoefficient((i+1)*4+1, -1);
-        nlCoefficient((i  )*4+1, 0.974);
-        nlCoefficient((i  )*4+2, 0.00111808*100); // remember that x and v are measured in cm and cm/s
+        nlCoefficient((i  )*4+1, 0.978);
+        nlCoefficient((i  )*4+2, 0.0946242);
         nlEnd(NL_ROW);
-
+/*
         nlRowScaling(1000);
         nlBegin(NL_ROW); // error integral
         nlCoefficient((i+1)*4+3, -1);
         nlCoefficient((i  )*4+3,  1);
         nlCoefficient((i  )*4  , .002);
-        nlEnd(NL_ROW);
+        nlEnd(NL_ROW);*/
     }
 
     for (int i=0; i<N; i++) {
-        nlRowScaling(5);
+        nlRowScaling(.5);
         nlBegin(NL_ROW); // xi = 0, soft
         nlCoefficient(i*4, 1);
         nlEnd(NL_ROW);
 
-        nlRowScaling(1);
+        nlRowScaling(.1);
         nlBegin(NL_ROW); // vi = 0, soft
         nlCoefficient(i*4+1, 1);
         nlEnd(NL_ROW);
 
-        nlRowScaling(4);
+        nlRowScaling(.4);
         nlBegin(NL_ROW); // ui = 0, soft
         nlCoefficient(i*4+2, 1);
         nlEnd(NL_ROW);
 
-        nlRowScaling(.1);
+/*        nlRowScaling(.1);
         nlBegin(NL_ROW); // zi = 0, soft
         nlCoefficient(i*4+3, 1);
-        nlEnd(NL_ROW);
+        nlEnd(NL_ROW);*/
     }
 
     nlEnd(NL_MATRIX);
@@ -105,8 +110,8 @@ int main() {
 
     for (int i=0; i<N; i++) {
         nlBegin(NL_ROW);
-        nlCoefficient(0, solution[i*4  ]/100); // bring position and speed back to m and m/s
-        nlCoefficient(1, solution[i*4+1]/100);
+        nlCoefficient(0, solution[i*4  ]);
+        nlCoefficient(1, solution[i*4+1]);
         nlCoefficient(2, solution[i*4+3]);
         nlRightHandSide(solution[i*4+2]);
         nlEnd(NL_ROW);

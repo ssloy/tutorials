@@ -57,13 +57,13 @@ void setup() {
 
 void loop() {
     vi = xi-xi_1;
-    zi += xi*.001*.01*.002;
-    int ui = 255.*(-0.000973669*xi -0.0563218*vi)/24.;
+//    zi += xi*.001*.002;
+    int ui = 255.*(-(0.939518/1000.)*xi - (0.159347*500./1000.)*vi /*-0.001425887*zi*/ + copysignf(.9,vi))/24.;
 
     if (1024>cnt) {
-        if (0==cnt&3) {
-            xi_log[cnt>>2] = xi;
-            vi_log[cnt>>2] = vi;
+        if (0==(cnt&3)) {
+            xi_log[cnt/4] = xi;
+            vi_log[cnt/4] = vi;
         }
         cnt++;
         set_speed(ui);
@@ -74,13 +74,13 @@ void loop() {
         Serial.println("ms ");
 
         for (int i=0; i<256; i++) {
-            Serial.print(xi_log[i]*.001*.01); // meters
+            Serial.print(xi_log[i]*.001); // cm
             Serial.print(" ");
         }
         Serial.println("");
 
         for (int i=0; i<256; i++) {
-            Serial.print(vi_log[i]*.005); // meters/second
+            Serial.print(vi_log[i]*.5); // cm/sec
             Serial.print(" ");
         }
         Serial.println("");

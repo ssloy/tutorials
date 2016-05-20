@@ -1,0 +1,28 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage[utf8x]{inputenc}
+
+\usepackage[a4paper,body={6.5in, 9.7in}]{geometry}
+\usepackage{amssymb,amsmath}
+
+\newcommand{\sign}{\text{sign}}
+\begin{document}
+
+\thispagestyle{empty}
+
+$$
+\begin{bmatrix}\dot{x}\\\ddot{x}\\\dot{\theta}\\\ddot{\theta}\end{bmatrix} = 
+\begin{bmatrix}
+0 & 1 & 0 & 0\\
+0 & 0 & \frac{-l^2m^2g}{D} & 0 \\ 
+0 & 0 & 0 & 1\\
+0 & 0 & \frac{lmg(M+m)}{D} & 0
+\end{bmatrix}
+\begin{bmatrix}{x}\\\dot{x}\\{\theta}\\\dot{\theta}\end{bmatrix}  +
+\begin{bmatrix} 0 \\ \frac{I+ml^2}{D} \\ 0 \\ \frac{-lm}{D} \end{bmatrix} f
+$$
+
+
+\end{document}
+
+

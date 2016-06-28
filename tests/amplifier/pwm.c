@@ -10,8 +10,8 @@
 
 FILE mystream;
 
-//volatile int analog_val;
-volatile unsigned char analog_val; // care should be taken about non-atomic access
+volatile int analog_val;
+//volatile unsigned char analog_val; // care should be taken about non-atomic access
 
 
 void uart_write(char x) {
@@ -65,6 +65,7 @@ int main(void) {
 
 
     { // setup PWM: https://sites.google.com/site/qeewiki/books/avr-guide/pwm-on-the-atmega328
+        // TODO inverted PWM in order to avoid spikes for zero duty cycles
         DDRD |= (1 << DDD6) | (1 << DDD5); // PD6 and PD5 are now output
 
         OCR0A = OCR0B = 0; // set PWM for 0% duty cycle
@@ -101,11 +102,12 @@ int main(void) {
 
     //      DDRC |= (1<<PC4);
     while (1) {
-        OCR0A = 100;
-        OCR0B = 0;
+        OCR0B = 255;
+        OCR0A = 0;
         //            PORTC |= (1<<PC4);
 
-        fprintf_P(&uart_stream, PSTR("voltage: %.2f\n"), analog_val*5./255.);
+//        fprintf_P(&uart_stream, PSTR("voltage: %.2f\n"), analog_val*5./255.);
+        fprintf_P(&uart_stream, PSTR("voltage: %.2f %d\n"), analog_val*5./1023., analog_val);
         //        PORTC &= ~(1<<PC4);
     }
 }
@@ -113,7 +115,7 @@ int main(void) {
 
 // Interrupt service routine for the ADC completion
 ISR(ADC_vect) {
-//    analog_val = ADCL | (ADCH << 8); // Must read low first
-    analog_val = (ADCL>>2) | (ADCH << 6);
+    analog_val = ADCL | (ADCH << 8); // Must read low first
+//    analog_val = (ADCL>>2) | (ADCH << 6);
 }
 

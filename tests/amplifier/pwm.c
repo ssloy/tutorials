@@ -70,12 +70,14 @@ int main(void) {
 
         OCR0A = OCR0B = 0; // set PWM for 0% duty cycle
 
-        TCCR0A |= (1 << COM0A1) | (1 << COM0B1); // set none-inverting mode
+        TCCR0A |= (1 << COM0A1) | (1 << COM0A0) | (1 << COM0B1) | (1 << COM0B0); // set inverting mode
+//        TCCR0A |= (1 << COM0A1) | (1 << COM0B1); // set none-inverting mode
         TCCR0A |= (1 << WGM01) | (1 << WGM00);   // set fast PWM Mode
         TCCR0B |= (1 << CS01);                   // set prescaler to 8 and starts PWM
     }
     { // setup ADC
-        // Bits 7:6    01 - Set REFS1..0 in ADMUX (0x7C) to change reference voltage to the proper source
+        // Bits 7:6    01 - Set REFS1..0 in ADMUX to AREF, to change reference voltage to the proper source
+        // Bits 7:6    00 - Set REFS1..0 in ADMUX to AREF, internal Vref turned off
         // Bit  5       0 - clear ADLAR in ADMUX (0x7C) to right-adjust the result ADCL will contain lower 8 bits, ADCH upper 2 (in last two bits)
         // Bit  4       0 - unuseed
         // Bits 3:0  0000 - ADC0 (Table 24-4)

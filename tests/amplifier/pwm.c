@@ -82,7 +82,7 @@ const unsigned char sinewave_data[] PROGMEM = {
 
 
 
-#define logsize 1024
+#define logsize 1000
 unsigned char readings[logsize];
 
 
@@ -100,7 +100,7 @@ int main(void) {
         // TODO inverted PWM in order to avoid spikes for zero duty cycles
         DDRD |= (1 << DDD6) | (1 << DDD5); // PD6 and PD5 are now output
 
-        OCR0A = OCR0B = 0; // set PWM for 0% duty cycle
+        OCR0A = OCR0B = 255; // set PWM for 0% duty cycle
 
         TCCR0A |= (1 << COM0A1) | (1 << COM0A0) | (1 << COM0B1) | (1 << COM0B0); // set inverting mode
         //        TCCR0A |= (1 << COM0A1) | (1 << COM0B1); // set none-inverting mode
@@ -148,9 +148,9 @@ int main(void) {
 
         // initialize overflow counter variable
         tot_overflow = 0;
-
     }
 
+    int last_log_idx = 0;
     //      DDRC |= (1<<PC4);
     while (1) {
 
@@ -163,25 +163,43 @@ int main(void) {
         //        PORTC &= ~(1<<PC4);
          */
 
-
         unsigned long micros;
         ATOMIC_BLOCK(ATOMIC_FORCEON) {
             micros = (TCNT1 + (((unsigned long)tot_overflow)<<16))<<6;
         }
+        if (micros>=500000) break;
 
-        int idx = ((int)(micros*(30000/1000000.)))&0x1FF;
+        int log_idx = (int)(micros*(2000/1000000.));
+        readings[log_idx] = analog_val;
+        if (log_idx>last_log_idx+1) { // sanity check
+            for (int i=0; i<logsize; i++) readings[i] = 255;
+            break;
+        }
+        last_log_idx = log_idx;
 
-        int voltage =  pgm_read_byte(&sinewave_data[idx&0xFF])*(idx>0xFF?1:-1);
+        // 60 Hz => 1/60 = .01(6) seconds per period
+        // micros / 10^6 increments once per second, thus 512 samples take 512 seconds
+        // micros * 512 / 10^6 increments once per 1/512 of a second, thus 512 samples will take 1 second
+        // micros * 512 * 60 / 10^6 = micros * .03072 will produce 60Hz sine wave with 256 samples half-period table
+
+        int sine_idx = (int)(micros*.03072) & 0x1FF;
+
+
+        int voltage = .7*pgm_read_byte(&sinewave_data[sine_idx & 0xFF])*(sine_idx > 0xFF ? 1 : -1);
         if (voltage>0) {
             OCR0A = 255-voltage;
-            OCR0B = 255-0;
+            OCR0B = 255;
         } else {
-            OCR0A = 255-0;
+            OCR0A = 255;
             OCR0B = 255+voltage;
         }
-
-
     }
+
+    for (int i=0; i<logsize; i++) {
+        fprintf_P(&uart_stream, PSTR("%d, "), readings[i]);
+    }
+    fprintf_P(&uart_stream, PSTR("\n"));
+    OCR0B = OCR0A = 255;
 }
 
 

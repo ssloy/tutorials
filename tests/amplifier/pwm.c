@@ -12,8 +12,8 @@
 
 FILE mystream;
 
-volatile int analog_val;
-//volatile unsigned char analog_val; // care should be taken about non-atomic access
+//volatile int analog_val;
+volatile unsigned char analog_val = 0; // care should be taken about non-atomic access
 
 
 void uart_write(char x) {
@@ -82,8 +82,13 @@ const unsigned char sinewave_data[] PROGMEM = {
 
 
 
+#define logsize 1024
+unsigned char readings[logsize];
+
 
 int main(void) {
+    for (int i=0; i<logsize; i++) readings[i] = 255;
+
     uart_init();
     FILE uart_stream = FDEV_SETUP_STREAM(uart_putchar, uart_getchar, _FDEV_SETUP_RW);
     stdin = stdout = &uart_stream;
@@ -98,7 +103,7 @@ int main(void) {
         OCR0A = OCR0B = 0; // set PWM for 0% duty cycle
 
         TCCR0A |= (1 << COM0A1) | (1 << COM0A0) | (1 << COM0B1) | (1 << COM0B0); // set inverting mode
-//        TCCR0A |= (1 << COM0A1) | (1 << COM0B1); // set none-inverting mode
+        //        TCCR0A |= (1 << COM0A1) | (1 << COM0B1); // set none-inverting mode
         TCCR0A |= (1 << WGM01) | (1 << WGM00);   // set fast PWM Mode
         TCCR0B |= (1 << CS01);                   // set prescaler to 8 and starts PWM
     }
@@ -150,30 +155,30 @@ int main(void) {
     while (1) {
 
 
-/*
+        /*
         //            PORTC |= (1<<PC4);
 
-//        fprintf_P(&uart_stream, PSTR("voltage: %.2f\n"), analog_val*5./255.);
+        //        fprintf_P(&uart_stream, PSTR("voltage: %.2f\n"), analog_val*5./255.);
         fprintf_P(&uart_stream, PSTR("voltage: %.2f %d\n"), analog_val*5./1023., analog_val);
         //        PORTC &= ~(1<<PC4);
-*/
+         */
 
 
         unsigned long micros;
-      ATOMIC_BLOCK(ATOMIC_FORCEON) {
-          micros = (TCNT1 + (((unsigned long)tot_overflow)<<16))<<6;
-      }
+        ATOMIC_BLOCK(ATOMIC_FORCEON) {
+            micros = (TCNT1 + (((unsigned long)tot_overflow)<<16))<<6;
+        }
 
-      int idx = ((int)(micros*(30000/1000000.)))&0x1FF;
+        int idx = ((int)(micros*(30000/1000000.)))&0x1FF;
 
-int voltage =  pgm_read_byte(&sinewave_data[idx&0xFF])*(idx>0xFF?1:-1);
-if (voltage>0) {
-    OCR0A = 255-voltage;
-    OCR0B = 255-0;
-} else {
-    OCR0A = 255-0;
-    OCR0B = 255+voltage;
-}
+        int voltage =  pgm_read_byte(&sinewave_data[idx&0xFF])*(idx>0xFF?1:-1);
+        if (voltage>0) {
+            OCR0A = 255-voltage;
+            OCR0B = 255-0;
+        } else {
+            OCR0A = 255-0;
+            OCR0B = 255+voltage;
+        }
 
 
     }
@@ -182,8 +187,8 @@ if (voltage>0) {
 
 // Interrupt service routine for the ADC completion
 ISR(ADC_vect) {
-    analog_val = ADCL | (ADCH << 8); // Must read low first
-//    analog_val = (ADCL>>2) | (ADCH << 6);
+//    analog_val = ADCL | (ADCH << 8); // Must read low first
+    analog_val = (ADCL>>2) | (ADCH<<6);
 }
 
 

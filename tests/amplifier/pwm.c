@@ -182,7 +182,9 @@ int main(void) {
         // micros * 512 / 10^6 increments once per 1/512 of a second, thus 512 samples will take 1 second
         // micros * 512 * 60 / 10^6 = micros * .03072 will produce 60Hz sine wave with 256 samples half-period table
 
-        int sine_idx = (int)(micros*.03072) & 0x1FF;
+//        int sine_idx = (int)(micros*.03072             ) & 0x1FF; // sine 60 Hz
+//        int sine_idx = (int)(micros*.03072*.5          ) & 0x1FF; // sine 30 Hz
+        int sine_idx = (int)(micros*.03072*.16666666667) & 0x1FF; // sine 10 Hz
 
 
         int voltage = .7*pgm_read_byte(&sinewave_data[sine_idx & 0xFF])*(sine_idx > 0xFF ? 1 : -1);

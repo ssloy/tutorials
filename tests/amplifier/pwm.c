@@ -184,10 +184,17 @@ int main(void) {
 
 //        int sine_idx = (int)(micros*.03072             ) & 0x1FF; // sine 60 Hz
 //        int sine_idx = (int)(micros*.03072*.5          ) & 0x1FF; // sine 30 Hz
-        int sine_idx = (int)(micros*.03072*.16666666667) & 0x1FF; // sine 10 Hz
+//        int sine_idx = (int)(micros*.03072*.16666666667) & 0x1FF; // sine 10 Hz
+
+//        int voltage = .7*pgm_read_byte(&sinewave_data[sine_idx & 0xFF])*(sine_idx > 0xFF ? 1 : -1);
+
+        // (micros/1000) are milliseconds, (micros / 1000) % 100 is a position inside 10Hz square wave
+        int voltage = (micros/1000)%100 < 50 ? 255*.8 : 0;
+//        int voltage = (micros/1000)%100 < 50 ? 255*.6 : 0;
+//        int voltage = (micros/1000)%100 < 50 ? 255*.3 : 0;
+//        int voltage = (micros/1000)%100 < 50 ? 255*.1 : 0;
 
 
-        int voltage = .7*pgm_read_byte(&sinewave_data[sine_idx & 0xFF])*(sine_idx > 0xFF ? 1 : -1);
         if (voltage>0) {
             OCR0A = 255-voltage;
             OCR0B = 255;
@@ -202,6 +209,8 @@ int main(void) {
         fprintf_P(&uart_stream, PSTR("%d, "), readings[i]);
     }
     fprintf_P(&uart_stream, PSTR("\n"));
+//    OCR0B = 0;
+//    while(1) ;
 }
 
 

@@ -195,11 +195,11 @@ int main(void) {
         }
     }
 
+    OCR0B = OCR0A = 255;
     for (int i=0; i<logsize; i++) {
         fprintf_P(&uart_stream, PSTR("%d, "), readings[i]);
     }
     fprintf_P(&uart_stream, PSTR("\n"));
-    OCR0B = OCR0A = 255;
 }
 
 

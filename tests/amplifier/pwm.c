@@ -87,7 +87,6 @@ unsigned char readings[logsize];
 
 
 int main(void) {
-    for (int i=0; i<logsize; i++) readings[i] = 255;
 
     uart_init();
     FILE uart_stream = FDEV_SETUP_STREAM(uart_putchar, uart_getchar, _FDEV_SETUP_RW);
@@ -113,7 +112,7 @@ int main(void) {
         // Bit  5       0 - clear ADLAR in ADMUX (0x7C) to right-adjust the result ADCL will contain lower 8 bits, ADCH upper 2 (in last two bits)
         // Bit  4       0 - unuseed
         // Bits 3:0  0000 - ADC0 (Table 24-4)
-        ADMUX = 0b01000000;
+        ADMUX = 0b00000000;
 
         // Bit  7      1 - ADC Enable
         // Bit  6      0 - ADC Start conversion (well, no start here)
@@ -150,67 +149,74 @@ int main(void) {
         tot_overflow = 0;
     }
 
-    int last_log_idx = 0;
-    //      DDRC |= (1<<PC4);
-    while (1) {
 
-
-        /*
-        //            PORTC |= (1<<PC4);
-
-        //        fprintf_P(&uart_stream, PSTR("voltage: %.2f\n"), analog_val*5./255.);
-        fprintf_P(&uart_stream, PSTR("voltage: %.2f %d\n"), analog_val*5./1023., analog_val);
-        //        PORTC &= ~(1<<PC4);
-         */
-
+    for (int measurement=0; measurement < 8; measurement++) {
+        for (int i=0; i<logsize; i++) readings[i] = 255;
+        int last_log_idx = 0;
+        int voltage = 0;
         unsigned long micros;
+
         ATOMIC_BLOCK(ATOMIC_FORCEON) {
-            micros = (TCNT1 + (((unsigned long)tot_overflow)<<16))<<6;
+            TCNT1 = 0;
+            tot_overflow = 0;
         }
-        if (micros>=500000) break;
 
-        int log_idx = (int)(micros*(2000/1000000.));
-        readings[log_idx] = analog_val;
-        if (log_idx>last_log_idx+1) { // sanity check
-            for (int i=0; i<logsize; i++) readings[i] = 255;
-            break;
+        while (1) {
+            ATOMIC_BLOCK(ATOMIC_FORCEON) {
+                micros = (TCNT1 + (((unsigned long)tot_overflow)<<16))<<6;
+            }
+            if (micros>=500000) break;
+
+            int log_idx = (int)(micros*(2000/1000000.));
+            readings[log_idx] = analog_val;
+            if (log_idx>last_log_idx+1) { // sanity check
+                for (int i=0; i<logsize; i++) readings[i] = 255;
+                break;
+            }
+            last_log_idx = log_idx;
+
+            // 60 Hz => 1/60 = .01(6) seconds per period
+            // micros / 10^6 increments once per second, thus 512 samples take 512 seconds
+            // micros * 512 / 10^6 increments once per 1/512 of a second, thus 512 samples will take 1 second
+            // micros * 512 * 60 / 10^6 = micros * .03072 will produce 60Hz sine wave with 256 samples half-period table
+
+            int sine_idx = 0;
+            switch (measurement) {
+                case 0: sine_idx = (int)(micros*.03072             ) & 0x1FF; break; // sine 60 Hz
+                case 1: sine_idx = (int)(micros*.03072*.5          ) & 0x1FF; break; // sine 30 Hz
+                case 2: sine_idx = (int)(micros*.03072*.16666666667) & 0x1FF; break; // sine 10 Hz
+            }
+
+            if (measurement<3) {
+                voltage = .7*pgm_read_byte(&sinewave_data[sine_idx & 0xFF])*(sine_idx > 0xFF ? -1 : 1);
+            } else {
+                // (micros/1000) are milliseconds, (micros / 1000) % 100 is a position inside 10Hz square wave
+                switch (measurement) {
+                    case 3: voltage = (micros/1000)%100 < 50 ? 255*.8 : 0; break;
+                    case 4: voltage = (micros/1000)%100 < 50 ? 255*.6 : 0; break;
+                    case 5: voltage = (micros/1000)%100 < 50 ? 255*.3 : 0; break;
+                    case 6: voltage = (micros/1000)%100 < 50 ? 255*.1 : 0; break;
+                    case 7: voltage = 0; break;
+                }
+            }
+
+            if (voltage>0) {
+                OCR0A = 255-voltage;
+                OCR0B = 255;
+            } else {
+                OCR0A = 255;
+                OCR0B = 255+voltage;
+            }
         }
-        last_log_idx = log_idx;
 
-        // 60 Hz => 1/60 = .01(6) seconds per period
-        // micros / 10^6 increments once per second, thus 512 samples take 512 seconds
-        // micros * 512 / 10^6 increments once per 1/512 of a second, thus 512 samples will take 1 second
-        // micros * 512 * 60 / 10^6 = micros * .03072 will produce 60Hz sine wave with 256 samples half-period table
-
-//        int sine_idx = (int)(micros*.03072             ) & 0x1FF; // sine 60 Hz
-//        int sine_idx = (int)(micros*.03072*.5          ) & 0x1FF; // sine 30 Hz
-        int sine_idx = (int)(micros*.03072*.16666666667) & 0x1FF; // sine 10 Hz
-
-        int voltage = .7*pgm_read_byte(&sinewave_data[sine_idx & 0xFF])*(sine_idx > 0xFF ? 1 : -1);
-
-        // (micros/1000) are milliseconds, (micros / 1000) % 100 is a position inside 10Hz square wave
-//        int voltage = (micros/1000)%100 < 50 ? 255*.8 : 0;
-//        int voltage = (micros/1000)%100 < 50 ? 255*.6 : 0;
-//        int voltage = (micros/1000)%100 < 50 ? 255*.3 : 0;
-//        int voltage = (micros/1000)%100 < 50 ? 255*.1 : 0;
-
-
-        if (voltage>0) {
-            OCR0A = 255-voltage;
-            OCR0B = 255;
-        } else {
-            OCR0A = 255;
-            OCR0B = 255+voltage;
+        OCR0B = OCR0A = 255;
+        fprintf_P(&uart_stream, PSTR("["));
+        for (int i=0; i<logsize; i++) {
+            fprintf_P(&uart_stream, PSTR("%d"), readings[i]);
+            if (i<logsize-1) fprintf_P(&uart_stream, PSTR(", "));
         }
+        fprintf_P(&uart_stream, PSTR("],\n"));
     }
-
-    OCR0B = OCR0A = 255;
-    for (int i=0; i<logsize; i++) {
-        fprintf_P(&uart_stream, PSTR("%d, "), readings[i]);
-    }
-    fprintf_P(&uart_stream, PSTR("\n"));
-//    OCR0B = 0;
-//    while(1) ;
 }
 
 

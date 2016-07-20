@@ -149,6 +149,9 @@ int main(void) {
         tot_overflow = 0;
     }
 
+    int pc4state = 1;
+    DDRC |= (1<<PC4);
+
 
     for (int measurement=0; measurement < 8; measurement++) {
         for (int i=0; i<logsize; i++) readings[i] = 255;
@@ -162,6 +165,13 @@ int main(void) {
         }
 
         while (1) {
+            if (pc4state) {
+                PORTC &= ~(1<<PC4);
+            } else {
+                PORTC |= (1<<PC4);
+            }
+            pc4state = 1-pc4state;
+
             ATOMIC_BLOCK(ATOMIC_FORCEON) {
                 micros = (TCNT1 + (((unsigned long)tot_overflow)<<16))<<6;
             }

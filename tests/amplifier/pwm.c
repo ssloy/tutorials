@@ -13,7 +13,7 @@
 FILE mystream;
 
 //volatile int analog_val;
-volatile unsigned char analog_val = 0; // care should be taken about non-atomic access
+volatile unsigned char analog_val = 127; // care should be taken about non-atomic access
 
 
 void uart_write(char x) {
@@ -62,6 +62,7 @@ void uart_init() {
 // global variable to count the number of overflows
 volatile unsigned char tot_overflow;
 
+/*
 const unsigned char sinewave_data[] PROGMEM = {
 0x0,0x3,0x6,0x9,0xc,0xf,0x12,0x15,0x18,0x1c,0x1f,0x22,0x25,0x28,0x2b,0x2e,
 0x31,0x34,0x37,0x3a,0x3d,0x40,0x44,0x47,0x4a,0x4d,0x4f,0x52,0x55,0x58,0x5b,0x5e,
@@ -79,7 +80,25 @@ const unsigned char sinewave_data[] PROGMEM = {
 0x8d,0x8b,0x88,0x85,0x83,0x80,0x7d,0x7a,0x78,0x75,0x72,0x6f,0x6d,0x6a,0x67,0x64,
 0x61,0x5e,0x5b,0x58,0x55,0x52,0x4f,0x4d,0x4a,0x47,0x44,0x40,0x3d,0x3a,0x37,0x34,
 0x31,0x2e,0x2b,0x28,0x25,0x22,0x1f,0x1c,0x18,0x15,0x12,0xf,0xc,0x9,0x6,0x3};
+*/
 
+const unsigned char sinewave_data[] PROGMEM = {
+0,2,4,6,8,10,12,14,16,19,21,23,25,28,30,32,
+34,36,38,40,42,44,47,49,51,53,55,57,59,61,63,65,
+67,70,72,74,76,77,79,81,84,85,87,89,91,93,95,97,
+98,100,102,104,105,107,109,111,112,114,116,117,119,121,122,124,
+125,127,128,130,131,133,135,136,137,139,140,141,142,144,145,147,
+148,149,150,151,152,154,154,156,156,158,158,160,161,161,163,163,
+164,165,165,167,168,168,169,170,170,170,171,172,172,173,173,174,
+175,175,175,175,176,176,177,177,177,177,177,177,177,177,177,177,
+178,177,177,177,177,177,177,177,177,177,177,176,176,175,175,175,
+175,174,173,173,172,172,171,170,170,170,169,168,168,167,165,165,
+164,163,163,161,161,160,158,158,156,156,154,154,152,151,150,149,
+148,147,145,144,142,141,140,139,137,136,135,133,131,130,128,127,
+125,124,122,121,119,117,116,114,112,111,109,107,105,104,102,100,
+98,97,95,93,91,89,87,85,84,81,79,77,76,74,72,70,
+67,65,63,61,59,57,55,53,51,49,47,44,42,40,38,36,
+34,32,30,28,25,23,21,19,16,14,12,10,8,6,4,2};
 
 
 #define logsize 1000
@@ -149,20 +168,35 @@ int main(void) {
         tot_overflow = 0;
     }
 
-    int pc4state = 1;
     DDRC |= (1<<PC4);
-
 
     for (int measurement=0; measurement < 8; measurement++) {
         for (int i=0; i<logsize; i++) readings[i] = 255;
         int last_log_idx = 0;
-        int voltage = 0;
+        long y=0, g=0, e=0, x = 0, u = 0;
+        // Вход: y (измерение), g (задание по току)
+        // Внутренняя переменная x.
+        // Выход: u (скважность для ШИМ)
+        //
+        // определим ошибку как e( k ):
+        // e ( k ) = g( k ) - y( k );
+        //
+        // интегрируем ошибку, ограничивая интеграл на каждом шаге суммирования:
+        // x ( k ) = min(x_max, max(x_min, x ( k-1 ) + a*e( k )));
+        //
+        // тогда выход это взвешенная сумма ошибки и интеграла ошибки:
+        // u ( k ) = min(u_max, max(u_min, x ( k ) + b*e( k )));
+
         unsigned long micros;
+        unsigned int milbis;
 
         ATOMIC_BLOCK(ATOMIC_FORCEON) {
             TCNT1 = 0;
             tot_overflow = 0;
         }
+
+        int pc4state = 1;
+        int voltage = 0;
 
         while (1) {
             if (pc4state) {
@@ -175,65 +209,81 @@ int main(void) {
             ATOMIC_BLOCK(ATOMIC_FORCEON) {
                 micros = (TCNT1 + (((unsigned long)tot_overflow)<<16))<<6;
             }
-            if (micros>=500000) break;
+            milbis = micros >> 10;
+            if (milbis>=500) break;
 
-            int log_idx = (int)(micros*(2000/1000000.));
+            int log_idx = micros>>9;
             readings[log_idx] = analog_val;
+
+            y = (((int)analog_val<<1) - 255)*72; // (((int)analog_val<<1) - 255) / 512 * 5V / .000136V/mA 
+
             if (log_idx>last_log_idx+1) { // sanity check
                 for (int i=0; i<logsize; i++) readings[i] = 255;
+                fprintf_P(&uart_stream, PSTR("error\n"));
                 break;
             }
             last_log_idx = log_idx;
+
 
             // 60 Hz => 1/60 = .01(6) seconds per period
             // micros / 10^6 increments once per second, thus 512 samples take 512 seconds
             // micros * 512 / 10^6 increments once per 1/512 of a second, thus 512 samples will take 1 second
             // micros * 512 * 60 / 10^6 = micros * .03072 will produce 60Hz sine wave with 256 samples half-period table
 
+
+            // milbis increments once every 1024 microseconds, thus 512 samples take 512*1024 microseconds
+            // milbis*512 will take 1024 microseconds for 512 samples
+
             int sine_idx = 0;
             switch (measurement) {
-                case 0: sine_idx = (int)(micros*.03072             ) & 0x1FF; break; // sine 60 Hz
-                case 1: sine_idx = (int)(micros*.03072*.5          ) & 0x1FF; break; // sine 30 Hz
-                case 2: sine_idx = (int)(micros*.03072*.16666666667) & 0x1FF; break; // sine 10 Hz
+                case 0: sine_idx = (micros>>5) & 0x1FF; break; // sine 61.04 Hz : 32uS per increment, one sine period in 32uS*512 samples, thus the frequency is 1/(32*512/10^6) = 61.03515625 Hz
+                case 1: sine_idx = (micros>>6) & 0x1FF; break; // sine 30.52 Hz
+                case 2: sine_idx = (micros>>7) & 0x1FF; break; // sine 15.26 Hz
             }
-
             if (measurement<3) {
-                voltage = .7*pgm_read_byte(&sinewave_data[sine_idx & 0xFF])*(sine_idx > 0xFF ? -1 : 1);
+                if (sine_idx & 0x100) {
+                    g = -pgm_read_byte(&sinewave_data[sine_idx & 0xFF]);
+                } else {
+                    g =  pgm_read_byte(&sinewave_data[sine_idx & 0xFF]);
+                }
             } else {
-                // (micros/1000) are milliseconds, (micros / 1000) % 100 is a position inside 10Hz square wave
                 switch (measurement) {
-                    case 3: voltage = (micros/1000)%100 < 50 ? 255*.8 : 0; break;
-                    case 4: voltage = (micros/1000)%100 < 50 ? 255*.6 : 0; break;
-                    case 5: voltage = (micros/1000)%100 < 50 ? 255*.3 : 0; break;
-                    case 6: voltage = (micros/1000)%100 < 50 ? 255*.1 : 0; break;
-                    case 7: voltage = 0; break;
+                    case 3: g = milbis & 64 ? 0 : 204; break;
+                    case 4: g = milbis & 64 ? 0 : 153; break;
+                    case 5: g = milbis & 64 ? 0 : 77; break;
+                    case 6: g = milbis & 64 ? 0 : 26; break;
+                    case 7: g = 0; break;
                 }
             }
 
-            if (voltage>0) {
+            g *= 20; // mA
+
+            e = g - y;
+            x = x + e*176L;// 2700.*.000065*1000*e;
+
+            if (x> 19200000L) x =  19200000L;
+            if (x<-19200000L) x = -19200000L;
+
+            u = 2314L*e + x; // uV
+
+            if (u> 23280000L) u =  23280000L;
+            if (u<-23280000L) u = -23280000L;
+
+
+            voltage = (u*51L)/4800000L;
+
+            if (voltage>=0) {
                 OCR0A = 255-voltage;
                 OCR0B = 255;
             } else {
                 OCR0A = 255;
                 OCR0B = 255+voltage;
             }
-
-            // Вход: y (измерение), g (задание по току)
-            // Внутренняя переменная x.
-            // Выход: u (скважность для ШИМ)
-            //
-            // определим ошибку как e( k ):
-            // e ( k ) = g( k ) - y( k );
-            //
-            // интегрируем ошибку, ограничивая интеграл на каждом шаге суммирования:
-            // x ( k ) = min(x_max, max(x_min, x(k-1) + a*e( k )));
-            //
-            // тогда выход это взвешенная сумма ошибки и интеграла ошибки:
-            // u ( k ) = min(u_max, max(u_min, x(k) + b*e( k )));
-
+//            fprintf_P(&uart_stream, PSTR("%d %d %d %d %ld %ld %d\n"), analog_val, g, y, e, x, u, voltage);
         }
 
         OCR0B = OCR0A = 255;
+
         fprintf_P(&uart_stream, PSTR("["));
         for (int i=0; i<logsize; i++) {
             fprintf_P(&uart_stream, PSTR("%d"), readings[i]);

@@ -4,7 +4,7 @@
 #include <avr/io.h>
 #include <util/atomic.h>
 #include <avr/interrupt.h>
-//#include <util/delay.h>
+#include <util/delay.h>
 #include <stdio.h>
 #include <avr/pgmspace.h> // PSTR
 
@@ -45,15 +45,18 @@ int uart_getchar(FILE *stream) {
 }
 
 void uart_init() {
+   UBRR0H  = 0;
+    UBRR0L  = 8;
+      
+
     // For devisors see table 19-12 in the atmega328p datasheet.
     // U2X0, 16 -> 115.2k baud @ 16MHz. 
     // U2X0, 207 -> 9600 baud @ 16Mhz.
-    UBRR0H = 0;
-    UBRR0L = 16;
     UCSR0A = 1<<U2X0;
     // Enable  the transmitter. Reciever is disabled.
     UCSR0B = 1<<TXEN0;
     UCSR0C = (1<<UDORD0) | (1<<UCPHA0);  //(3 << UCSZ00);  
+
 
     fdevopen(&uart_putchar, &uart_getchar);
 }
@@ -104,6 +107,24 @@ const unsigned char sinewave_data[] PROGMEM = {
 #define logsize 1000
 unsigned char readings[logsize];
 
+inline transmit_byte(unsigned char *byte) {
+    unsigned char lo = *byte & 15;
+    unsigned char hi = *byte >> 4;
+    PORTB |= lo;
+    PORTB |= (1<<PB4);
+//    _delay_us(1);
+//    PORTB &= ~(1<<PB4);
+//    _delay_us(1);
+
+    PORTB &= ~31;
+    PORTB |= hi;
+    PORTB |= (1<<PB4);
+    PORTB &= ~31;
+//    _delay_us(1);
+//    PORTB &= ~(1<<PB4);
+//    _delay_us(1);
+}
+
 
 int main(void) {
 
@@ -111,7 +132,7 @@ int main(void) {
     FILE uart_stream = FDEV_SETUP_STREAM(uart_putchar, uart_getchar, _FDEV_SETUP_RW);
     stdin = stdout = &uart_stream;
 
-    DDRB = 0b00000000; // sets all the port B as input
+//     DDRB = 0b00000000; // sets all the port B as input ATTENTION PB6 & PB7 are oscillator pins?
 
 
     { // setup PWM: https://sites.google.com/site/qeewiki/books/avr-guide/pwm-on-the-atmega328
@@ -169,11 +190,15 @@ int main(void) {
     }
 
     DDRC |= (1<<PC4);
+    DDRB |= 31; // PB0-PB4 are output
+    PORTB &= ~31;
+
 
     for (int measurement=0; measurement < 8; measurement++) {
         for (int i=0; i<logsize; i++) readings[i] = 255;
         int last_log_idx = 0;
-        long y=0, g=0, e=0, x = 0, u = 0;
+        int y=0, g=0;
+        long e=0, x = 0, u = 0;
         // Вход: y (измерение), g (задание по току)
         // Внутренняя переменная x.
         // Выход: u (скважность для ШИМ)
@@ -259,7 +284,7 @@ int main(void) {
             g *= 20; // mA
 
             e = g - y;
-            x = x + e*176L;// 2700.*.000065*1000*e;
+            x = x + e*289L;// 2700.*.000107*1000*e;
 
             if (x> 19200000L) x =  19200000L;
             if (x<-19200000L) x = -19200000L;
@@ -280,6 +305,27 @@ int main(void) {
                 OCR0B = 255+voltage;
             }
 //            fprintf_P(&uart_stream, PSTR("%d %d %d %d %ld %ld %d\n"), analog_val, g, y, e, x, u, voltage);
+//            fprintf_P(&uart_stream, PSTR("%c\n"), *(char *)(void *)(&voltage));
+
+            for (char i=0; i<sizeof(micros); i++) {
+                transmit_byte((char *)(void *)(&micros)+i);
+            }
+
+            for (char i=0; i<sizeof(g); i++) {
+                transmit_byte((char *)(void *)(&g)+i);
+            }
+
+            for (char i=0; i<sizeof(y); i++) {
+                transmit_byte((char *)(void *)(&y)+i);
+            }
+
+            for (char i=0; i<sizeof(x); i++) {
+                transmit_byte((char *)(void *)(&x)+i);
+            }
+
+            for (char i=0; i<sizeof(voltage); i++) {
+                transmit_byte((char *)(void *)(&voltage)+i);
+            }
         }
 
         OCR0B = OCR0A = 255;

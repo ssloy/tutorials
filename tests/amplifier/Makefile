@@ -1,4 +1,4 @@
-GCCFLAGS=-g -Os -Wall -mmcu=atmega328p -std=gnu99
+GCCFLAGS=-g -O3 -mmcu=atmega328p -std=gnu99 -Wall -Wextra -pedantic
 LINKFLAGS=-Wl,-u,vfprintf -lprintf_flt -Wl,-u,vfscanf -lscanf_flt -lm
 AVRDUDEFLAGS=  -F -V -c arduino -p ATMEGA328P -P /dev/ttyUSB0 -b 57600
 

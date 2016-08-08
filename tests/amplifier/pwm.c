@@ -45,9 +45,9 @@ int uart_getchar(FILE *stream) {
 }
 
 void uart_init() {
-   UBRR0H  = 0;
-    UBRR0L  = 8;
-      
+    UBRR0H  = 0;
+    UBRR0L  = 16;
+
 
     // For devisors see table 19-12 in the atmega328p datasheet.
     // U2X0, 16 -> 115.2k baud @ 16MHz. 
@@ -152,7 +152,7 @@ int main(void) {
         // Bit  5       0 - clear ADLAR in ADMUX (0x7C) to right-adjust the result ADCL will contain lower 8 bits, ADCH upper 2 (in last two bits)
         // Bit  4       0 - unuseed
         // Bits 3:0  0000 - ADC0 (Table 24-4)
-        ADMUX = 0b00000000;
+        ADMUX = 0b01000000;
 
         // Bit  7      1 - ADC Enable
         // Bit  6      0 - ADC Start conversion (well, no start here)
@@ -281,7 +281,7 @@ int main(void) {
                 }
             }
 
-            g *= 20; // mA
+//            g *= 20; // mA
 
             e = g - y;
             x = x + e*289L;// 2700.*.000107*1000*e;
@@ -295,7 +295,8 @@ int main(void) {
             if (u<-23280000L) u = -23280000L;
 
 
-            voltage = (u*51L)/4800000L;
+//            voltage = (u*51L)/4800000L;
+            voltage = g;
 
             if (voltage>=0) {
                 OCR0A = 255-voltage;
@@ -304,12 +305,10 @@ int main(void) {
                 OCR0A = 255;
                 OCR0B = 255+voltage;
             }
-//            fprintf_P(&uart_stream, PSTR("%d %d %d %d %ld %ld %d\n"), analog_val, g, y, e, x, u, voltage);
-//            fprintf_P(&uart_stream, PSTR("%c\n"), *(char *)(void *)(&voltage));
 
-            for (char i=0; i<sizeof(micros); i++) {
-                transmit_byte((char *)(void *)(&micros)+i);
-            }
+//          for (char i=0; i<sizeof(micros); i++) {
+//              transmit_byte((char *)(void *)(&micros)+i);
+//          }
 
             for (char i=0; i<sizeof(g); i++) {
                 transmit_byte((char *)(void *)(&g)+i);
@@ -319,13 +318,13 @@ int main(void) {
                 transmit_byte((char *)(void *)(&y)+i);
             }
 
-            for (char i=0; i<sizeof(x); i++) {
-                transmit_byte((char *)(void *)(&x)+i);
-            }
+//          for (char i=0; i<sizeof(x); i++) {
+//              transmit_byte((char *)(void *)(&x)+i);
+//          }
 
-            for (char i=0; i<sizeof(voltage); i++) {
-                transmit_byte((char *)(void *)(&voltage)+i);
-            }
+//          for (char i=0; i<sizeof(voltage); i++) {
+//              transmit_byte((char *)(void *)(&voltage)+i);
+//          }
         }
 
         OCR0B = OCR0A = 255;

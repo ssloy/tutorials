@@ -1,0 +1,113 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T2A]{fontenc}
+\usepackage[russian]{babel}
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\thispagestyle{empty}
+
+
+\title{Laplace for dc motor}
+\author{ha}
+\date{October 2016}
+
+\newcommand{\Fourier}[1]{\mathcal{F}\left\{#1\right\}(s)}
+\newcommand{\Laplace}[1]{\mathcal{L}\left\{#1\right\}(s)}
+\newcommand{\ILaplace}[1]{\mathcal{L}^{-1}\left\{#1\right\}(t)}
+
+
+\begin{document}
+
+\maketitle
+
+\section{Fourier transform}
+$$
+f(t) = 7\sin(11 t) + 19 \cos(41 t)
+$$
+
+$$
+\Fourier{f(t)} : \mathbb{R} \rightarrow \mathbb{C}
+$$
+
+$$
+\mathcal{F}\left\{f(t)\right\}(11) = 7i, ~~~ \mathcal{F}\left\{f(t)\right\}(19) = 41
+$$
+
+$$
+f'(t) = 7 \cdot 11 \sin((11+90^\circ)t) +  19\cdot 41\cos((41+90^\circ)t) 
+$$
+
+$$
+\Fourier{f'} = i s \Fourier{f}
+$$
+
+\section{Laplace transform}
+
+$$
+    \Laplace{af(t) + bg(t)} = a\Laplace{f(t)} + b\Laplace{g(t)}
+$$
+
+$$
+    \Laplace{\frac{df}{dt}(t)} = s\Laplace{f(t)} - f(0)
+$$
+
+\section{Measure motor parameters}
+
+Let us fix the motor shaft; then $\omega(t)\equiv 0$.
+So if we provide $U(t)$ tension for our DC motor, then the current will follow next differential equation:
+
+\begin{equation}
+    L \frac{dI}{dt}(t) + RI(t) = U(t)
+\label{eq:motor}
+\end{equation}
+
+The idea is to feed known $U(t)$, measure $I(t)$ and then deduce $R$ and $L$ from measurements.
+
+\subsection{Unit step tension}
+
+Initial conditions: $I(0) = 0$. Input tension is constant: $U(t) = U_0$.
+Let us apply Laplace transform to both parts of our differential equation~\eqref{eq:motor}. 
+
+\begin{align*}
+    \Laplace{L \frac{dI}{dt}(t) + RI(t)} & = \Laplace{U(t)} \\
+    L\Laplace{\frac{dI}{dt}(t)} + R\Laplace{I(t)} & = \frac{U_0}{s} \\
+    L(s\Laplace{I(t)} - I(0)) + R\Laplace{I(t)} & = \frac{U_0}{s} \\
+    Ls\Laplace{I(t)} + R\Laplace{I(t)} & = \frac{U_0}{s} \\
+    (Ls+R)\Laplace{I(t)}  & = \frac{U_0}{s} \\
+    \Laplace{I(t)}  & = \frac{U_0}{s(Ls+R)} \\
+    \Laplace{I(t)}  & = \frac{U_0/R}{s} + \frac{-U_0/R}{s+R/L}
+\end{align*}
+
+The last equation is obtained with the method of partial fractions.
+Now let us apply the inverse Laplace transform:
+\begin{align*}
+\ILaplace{\Laplace{I(t)}}  & = \ILaplace{\frac{U_0/R}{s} + \frac{-U_0/R}{s+R/L}} \\
+I(t)  & = \frac{U_0}{R}\ILaplace{\frac{1}{s}} - \frac{U_0}{R}\ILaplace{\frac{1}{s+R/L}}\\
+I(t) & = \frac{U_0}{R} - \frac{U_0}{R}e^{-t R/L}
+\end{align*}
+
+It makes perfect sense: in several milliseconds from beginning the current will be equal to $U_0/R$ (Ohm's law); and the time necessary to reach this current depends directly on the inductance $L$.
+
+\subsection{Sinusoidal tension}
+Initial conditions: $I(0) = 0$. Input tension is sinusoidal: $U(t) = U_0\sin(F_0 t)$.
+As in the previous section, let us apply Laplace transform to both parts of our differential equation~\eqref{eq:motor}. 
+Our input tension is sinusoidal, so:
+$$
+\Laplace{U_0\sin(F_0t)} = \frac{U_0}{s^2 + F_0^2}
+$$
+
+then it is easy to see that
+\begin{align*}
+    \Laplace{I(t)}  & = \frac{F_0}{(s^2 + F_0^2)(Ls+R)} \\
+    \Laplace{I(t)}  & = \frac{-L U_0 F_0}{L^2 F_0^2 + R^2}\frac{s}{s^2 + F_0^2} +  \frac{R U_0 F_0}{L^2 F_0^2 + R^2}\frac{1}{s^2 + F_0^2} + \frac{L U_0 F_0}{L^2 F_0^2 + R^2}\frac{1}{s + R/L}  \\
+\end{align*}
+As before, apply the inverse Laplace transform and get the output signal:
+$$
+I(t) = \frac{-L U_0 F_0}{L^2 F_0^2 + R^2}\cos(F_0t) +  \frac{R U_0 F_0}{L^2 F_0^2 + R^2}\sin(F_0 t) + \frac{L U_0 F_0}{L^2 F_0^2 + R^2}e^{-tR/L} 
+$$
+And again it makes sense: after several milliseconds current will be a sinusoidal signal of the same frequency as the input tension, however it will have a lag (sum of a sine and a cosine is a sine with a lag). And at the very beginning the current is zero. Sanity check passed.
+
+% http://stackoverflow.com/questions/12233702/fitting-transfer-function-models-in-scipy-signal
+% https://courses.engr.illinois.edu/ece486/documents/set5.pdf
+
+\end{document}

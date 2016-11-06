@@ -1,0 +1,27 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T2A]{fontenc}
+\usepackage[russian]{babel}
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\thispagestyle{empty}
+
+
+\newcommand{\Fourier}[1]{\mathcal{F}\left\{#1\right\}(s)}
+\newcommand{\Laplace}[1]{\mathcal{L}\left\{#1\right\}(s)}
+\newcommand{\ILaplace}[1]{\mathcal{L}^{-1}\left\{#1\right\}(t)}
+
+
+\begin{document}
+
+\begin{align*}
+    \Laplace{L \frac{dI}{dt}(t) + RI(t)} & = \Laplace{U(t)} \\
+    L\Laplace{\frac{dI}{dt}(t)} + R\Laplace{I(t)} & = \frac{U_0}{s} \\
+    L(s\Laplace{I(t)} - I(0)) + R\Laplace{I(t)} & = \frac{U_0}{s} \\
+    Ls\Laplace{I(t)} + R\Laplace{I(t)} & = \frac{U_0}{s} \\
+    (Ls+R)\Laplace{I(t)}  & = \frac{U_0}{s} \\
+    \Laplace{I(t)}  & = \frac{U_0}{s(Ls+R)} \\
+    \Laplace{I(t)}  & = \frac{U_0/R}{s} + \frac{-U_0/R}{s+R/L}
+\end{align*}
+
+\end{document}

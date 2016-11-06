@@ -37,7 +37,7 @@ int main () {
             if (packet.size()==0 && bitno==0) {
                 time.push_back(nsamples);
             }
-            current |= (((c&4)>>2) << bitno);
+            current |= (((c&2)>>1) << bitno);
             bitno++;
             nraising++;
             if (8==bitno) {

@@ -1,0 +1,21 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T2A]{fontenc}
+\usepackage[russian]{babel}
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\thispagestyle{empty}
+
+
+\newcommand{\Fourier}[1]{\mathcal{F}\left\{#1\right\}(s)}
+\newcommand{\Laplace}[1]{\mathcal{L}\left\{#1\right\}(s)}
+\newcommand{\ILaplace}[1]{\mathcal{L}^{-1}\left\{#1\right\}(t)}
+
+
+\begin{document}
+\begin{equation}
+\frac{\Laplace{I(t)}}{\Laplace{J(t)}} = \frac{1}{\tau s + 1}
+\label{eq:currentloop}
+\end{equation}
+
+\end{document}

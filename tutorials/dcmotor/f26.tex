@@ -1,0 +1,24 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T2A]{fontenc}
+\usepackage[russian]{babel}
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\thispagestyle{empty}
+
+
+\newcommand{\Fourier}[1]{\mathcal{F}\left\{#1\right\}(s)}
+\newcommand{\Laplace}[1]{\mathcal{L}\left\{#1\right\}(s)}
+\newcommand{\ILaplace}[1]{\mathcal{L}^{-1}\left\{#1\right\}(t)}
+
+
+\begin{document}
+\begin{align*}
+    \frac{\Laplace{I(t)}}{\Laplace{U(t)}} \cdot \frac{\Laplace{J(t)}}{\Laplace{I(t)}} & = \frac{1}{Ls+R}  \cdot \frac{\tau s + 1}{1}\\
+    \frac{\Laplace{E(t) + I(t)}}{\Laplace{U(t)}}  & = \frac{\tau s+1}{Ls+R}\\
+    \frac{\Laplace{E(t)}}{\Laplace{U(t)}} + \frac{\Laplace{I(t)}}{\Laplace{U(t)}}  & = \frac{\tau s+1}{Ls+R}\\
+    \frac{\Laplace{E(t)}}{\Laplace{U(t)}}   & = \frac{\tau s+1}{Ls+R} - \frac{1}{Ls+R}\\
+    \frac{\Laplace{E(t)}}{\Laplace{U(t)}}   & = \frac{\tau s}{Ls+R}\\
+\end{align*}
+
+\end{document}

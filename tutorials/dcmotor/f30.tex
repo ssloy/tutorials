@@ -1,0 +1,24 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T2A]{fontenc}
+\usepackage[russian]{babel}
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\thispagestyle{empty}
+
+
+\newcommand{\Fourier}[1]{\mathcal{F}\left\{#1\right\}(s)}
+\newcommand{\Laplace}[1]{\mathcal{L}\left\{#1\right\}(s)}
+\newcommand{\ILaplace}[1]{\mathcal{L}^{-1}\left\{#1\right\}(t)}
+
+
+\begin{document}
+$$
+J(t) = I_0\sin(F_0t)} 
+$$
+
+$$
+I(t) = \frac{-\tau I_0 F_0}{\tau^2 F_0^2 + 1}\cos(F_0t) +  \frac{I_0}{\tau^2 F_0 + 1}\sin(F_0 t) + \frac{\tau I_0 F_0}{\tau^2 F_0^2 + 1}e^{-tR/L} 
+$$
+
+\end{document}

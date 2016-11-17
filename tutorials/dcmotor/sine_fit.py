@@ -18,7 +18,7 @@ ax1 = fig.add_subplot(111)
 
 ax1.set_title("Resistance/inductance fitting")
 ax1.set_xlabel('Time, sec')
-ax1.set_ylabel('Current, amp')
+ax1.set_ylabel('Current (A), tension (V)')
 
 ax1.plot(data['t'], data['V'], color='b', label='input tension')
 ax1.plot(data['t'], data['A'], color='g', label='measured current')

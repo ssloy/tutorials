@@ -197,6 +197,15 @@ const uint8_t sinewave_data[] PROGMEM = {
 67,65,63,61,59,57,55,53,51,49,47,44,42,40,38,36,
 34,32,30,28,25,23,21,19,16,14,12,10,8,6,4,2};
 
+inline void log_data(void *data, uint8_t size) {
+    uint8_t trash;
+    for (uint8_t i=size; i--; ) {
+        SPDR = *((uint8_t *)data+i);
+        while (!(SPSR & _BV(SPIF))); // wait for transmition complete
+        trash = SPDR;
+    }
+}
+
 
 int main(void) {
     timer_init();
@@ -209,28 +218,46 @@ int main(void) {
     FILE uart_stream = FDEV_SETUP_STREAM(uart_putchar, uart_getchar, _FDEV_SETUP_RW);
     stdin = stdout = &uart_stream;
 
-    uint32_t micros=0;
-    while(1) {
+
+//    for (uint8_t measurement=0; measurement<3; measurement++) {
+//        spi_tranceiver(128);
+//        _delay_ms(100);
         ATOMIC_BLOCK(ATOMIC_FORCEON) {
-            micros = (TCNT1 + ((uint32_t)tot_overflow<<16)) << 6;
+            TCNT1 = 0;
+            tot_overflow = 0;
         }
-        uint16_t sine_idx = (micros>>5) & 0x1FF; // sine 61.04 Hz : 32uS per increment, one sine period in 32uS*512 samples, thus the frequency is 1/(32*512/10^6) = 61.0351
-        uint8_t g = 0;
-        if (sine_idx & 0x100) {
-            g =      pgm_read_byte(&sinewave_data[sine_idx & 0xFF])>>1;
-        } else {
-            g = 127+(pgm_read_byte(&sinewave_data[sine_idx & 0xFF])>>1);
+        uint32_t micros=0;
+        while (1) {
+            ATOMIC_BLOCK(ATOMIC_FORCEON) {
+                micros = (TCNT1 + ((uint32_t)tot_overflow<<16)) << 6;
+            }
+            uint16_t sine_idx = (micros>>5) & 0x1FF; // sine 61.04 Hz : 32uS per increment, one sine period in 32uS*512 samples, thus the frequency is 1/(32*512/10^6) = 61.0351
+            uint8_t g = 0;
+            if (sine_idx & 0x100) {
+                g =  128-(pgm_read_byte(&sinewave_data[sine_idx & 0xFF])>>1);
+            } else {
+                g = 128+(pgm_read_byte(&sinewave_data[sine_idx & 0xFF])>>1);
+            }
+
+            uint8_t ack = spi_tranceiver(g);
+
+///            log_data(&micros, sizeof(micros));
+            log_data(&g, sizeof(g));
+            log_data(&ack, sizeof(ack));
+            if (micros>200000L) {
+                break;
+            }
+            //        fprintf_P(&uart_stream, PSTR("%ld %d %d\r\n"), micros, g, ack);
+            //        fprintf_P(&uart_stream, PSTR("%d %d\r\n"), g, ack);
+
+            //      int32_t ticks0 = read_decoder(0);
+            //      int32_t ticks1 = read_decoder(1);
+
+            //        fprintf_P(&uart_stream, PSTR("X: %ld \t Y: %ld \t ack: %d %d\r\n"), ticks0, ticks1, ack, cnt);
+            //        _delay_ms(200);
         }
-
-        uint8_t ack = spi_tranceiver(g);
-        fprintf_P(&uart_stream, PSTR("%ld %d %d\r\n"), micros, g, ack);
-
-//      int32_t ticks0 = read_decoder(0);
-//      int32_t ticks1 = read_decoder(1);
-
-//        fprintf_P(&uart_stream, PSTR("X: %ld \t Y: %ld \t ack: %d %d\r\n"), ticks0, ticks1, ack, cnt);
-//        _delay_ms(200);
-    }
+               spi_tranceiver(128);
+//    }
     return 0;
 }
 

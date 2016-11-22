@@ -6,10 +6,10 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-volatile uint16_t adc0_val  = 512; // adc readings
-volatile uint8_t  spi_in_msg  = 0; // задание силы тока
-volatile uint8_t  spi_out_msg = 0; // реально протекающий ток
-volatile uint8_t tot_overflow;     // global variable to count the number of overflows of timer1
+volatile uint16_t adc0_val  = 512;   // adc readings
+volatile uint8_t  spi_in_msg  = 128; // задание силы тока
+volatile uint8_t  spi_out_msg = 0;   // реально протекающий ток
+volatile uint8_t tot_overflow;       // global variable to count the number of overflows of timer1
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -89,7 +89,6 @@ int main(void) {
     spi_slave_init();
     adc_init();
     pwm_init();
-    timer_init();
 
     OCR0A = OCR0B = 255; // set PWM for 0% duty cycle
     int32_t tmp = 0;
@@ -126,6 +125,7 @@ int main(void) {
     DDRD |= _BV(PD7);        // пин PD7 будет мигать, это нужно для контроля длительности одной итерации цикла (осциллограф в помощь)
     int pd7_pin_toggle = 1; 
 
+    timer_init();
     while (1) {
         pd7_pin_toggle = 1 - pd7_pin_toggle;
         if (pd7_pin_toggle) {
@@ -140,7 +140,7 @@ int main(void) {
         spi_out_msg = y >> 2;
         y = (y - acs714_zero)*26;
 
-        g = (spi_in_msg<<1) - 255;
+        g = ((int32_t)spi_in_msg<<1) - 256;
         // g тоже должен измеряться в миллиамперах, поэтому домножим его на 5000/255 = 19.6, округляем до 20
         g *= 20L;
 
@@ -159,7 +159,7 @@ int main(void) {
             micros = (TCNT1 + ((uint32_t)tot_overflow<<16)) << 6;
         }
         dt = micros - oldmicros; // TODO uint32_t overflow (через час работы контроллер может сойти с ума)
-        x = x + (e*567L*dt)/250L;
+        x = x + ((e*567L*(int32_t)dt)/250L);
 
         // теперь насытим это дело до 80% от выходного значения. Максимум выходного значения +-24V, тогда 80% это +- 19.2V
         // x, по факту, измеряется в микровольтах

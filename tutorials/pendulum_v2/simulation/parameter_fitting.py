@@ -28,18 +28,30 @@ def finite_difference(time, x):
     return x_dot
 
 
-def find_nearest(array,value):
-    idx = np.searchsorted(array, value, side="left")
-    if idx > 0 and (idx == len(array) or abs(value - array[idx-1]) < abs(value - array[idx])):
+def interpolate_current(t):
+    idx = np.searchsorted(time, t, side="left")
+    if idx > 0 and (idx == len(time) or abs(t-time[idx-1]) < abs(t-time[idx])):
         return current[idx-1]
     else:
         return current[idx]
 
 def differentiate(state, t):
     start_freq, end_freq, duration = 2., 15., 10.
-    f = 4.6*find_nearest(time,t)
 
-#    f = 30*cos(2*3.14159*((start_freq + ((end_freq-start_freq)*t)/(2.*duration))*t))
+    f = interpolate_current(t)
+    f = 8.6*f
+
+#   f = 50*sin(2*3.14159*((start_freq + ((end_freq-start_freq)*t)/(2.*duration))*t))
+    friction = 0
+    fr_eps = .01
+    fr_amp = 1
+    if abs(state[1])>fr_eps:
+        friction = -fr_amp*np.sign(state[1])
+    else:
+        friction = -state[1]*fr_amp/fr_eps
+
+    f = f + friction
+
     A = np.matrix([[M+m, l*m*cos(state[2])],[l*m*cos(state[2]), I+l*l*m]])
     B = np.matrix([[f+l*m*sin(state[2])*(state[3]**2)],[g*l*m*sin(state[2])]])
     C = inv(A)*B

@@ -28,8 +28,8 @@ B = np.matrix([[0],[7*dt/(7*M+4*m)],[0],[-3*dt/(l*(7*M+4*m))]])
 
 print A,B
 
-Q = np.matrix("1 0 0 0; 0 .001 0 0 ; 0 0 1 0; 0 0 0 .001")
-R = np.matrix(".001")
+Q = np.matrix("1 0 0 0; 0 .0001 0 0 ; 0 0 1 0; 0 0 0 .0001")
+R = np.matrix(".0005")
 
 
 K = dlqr(A,B,Q,R)

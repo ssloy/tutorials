@@ -116,7 +116,7 @@ int state = 0;
 long time_prev;
 
 long cnt = 0;
-const int memlen = 6;
+const int memlen = 2;
 double X[memlen], TH[memlen];
 
 void loop() {
@@ -154,7 +154,7 @@ void loop() {
         return;
     }
     
-    double c[] = {24.953383, 18.540046, 70.435703, 14.976731};
+    double c[] = {34, 25, 89, 19};
 
     double f = c[0]*x + c[1]*v + c[2]*th + c[3]*w;
     double u = ((1-.404)*v + .02*f/.49 + copysignf(.01, v))/.055;

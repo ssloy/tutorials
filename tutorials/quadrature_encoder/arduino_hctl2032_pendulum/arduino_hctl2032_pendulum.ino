@@ -119,7 +119,22 @@ long cnt = 0;
 const int memlen = 2;
 double X[memlen], TH[memlen];
 
+long tticks,tticks_prev;
 void loop() {
+  tticks = read_decoder(0);
+  long dt = micros() - time_prev;
+  time_prev = micros();
+
+  Serial.print("HCTL2032: ");
+  Serial.print(tticks);
+  Serial.print(", ");
+  Serial.print((tticks-tticks_prev)/8000.*1000000./dt);
+  Serial.println(" RPM");
+  tticks_prev = tticks;
+
+  delay(100);
+  return;
+  
   if (0==state) {
     double x  = read_cart_position();
     double th = read_pendulum_angle();

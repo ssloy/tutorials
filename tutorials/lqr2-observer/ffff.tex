@@ -1,0 +1,102 @@
+\documentclass{article}
+\usepackage{amssymb,amsmath}
+\begin{document}
+\thispagestyle{empty}
+
+\iffalse
+$$
+\left \{ \begin{array}{r l}
+x_{k+1} & = x_k + v_k\\
+v_{k+1} & = v_k + u_k
+\end{array} \right.
+$$
+
+
+$$
+\vec{x}_{k+1} = A \vec{x}_k + B \vec{u}_k
+$$
+$$
+\vec{x}_k=\begin{pmatrix}x_k\\v_k\end{pmatrix}\qquad \vec{u}_k=\begin{pmatrix}u_k\end{pmatrix}\qquad A=\begin{pmatrix} 1 & 1 \\ 0 & 1\end{pmatrix} \qquad B=\begin{pmatrix}0\\1\end{pmatrix}
+$$
+
+$$
+J(\vec{x}_0\dots\vec{x}_N,\vec{u}_0\dots\vec{u}_{N-1}) = \sum\limits_{k=0}^{N-1}\left( \vec{x}_k^\top Q\vec{x}_k + \vec{u}_k^\top R\vec{u}_k\right) + \vec{x}_N^\top Q \vec{x}_N
+$$
+
+$$
+\begin{array}{l}
+\min J(\vec{x}_0\dots\vec{x}_N,\vec{u}_0\dots\vec{u}_{N-1})\\
+s.t.\quad 0\leq k < N : \vec{x}_{k+1} = A \vec{x}_k + B \vec{u}_k
+\end{array}
+$$
+
+$$
+J(\vec{x}_0\dots\vec{x}_N,\vec{u}_0\dots\vec{u}_{N-1}) = \sum\limits_{k=0}^{N} \|\vec{x}_k\|^2 + 256 \sum\limits_{k=0}^{N-1} u_k^2
+$$
+
+
+$$
+X=\begin{pmatrix}\vec{x}_0\\ \vec{x}_1 \\ \vdots \\ \vec{x}_N\end{pmatrix} 
+\qquad
+U=\begin{pmatrix}\vec{u}_0\\ \vec{u}_1 \\ \vdots \\ \vec{u}_{N-1}\end{pmatrix} 
+$$
+
+$$
+\begin{pmatrix}\vec{x}_0\\ \vec{x}_1 \\ \vdots \\ \vec{x}_N\end{pmatrix} =
+\underbrace{\begin{pmatrix}
+\vec{0}  & \vec{0}  & \vec{0}  & \dots  & \vec{0} \\
+B        & \vec{0}  & \vec{0}  & \dots  & \vec{0} \\
+AB       & B        & \vec{0}  & \dots  & \vec{0} \\
+\vdots   &          &          & \ddots & \vdots  \\
+A^{N-1}B & A^{N-2}B & A^{N-3}B & \dots  & B       \\
+\end{pmatrix}}_{:= G}
+\begin{pmatrix}\vec{u}_0\\ \vec{u}_1 \\ \vdots \\ \vec{u}_{N-1}\end{pmatrix} 
++
+\underbrace{\begin{pmatrix}I_{N\times N}\\A\\A^2\\\vdots\\A^N\end{pmatrix}}_{:= H}\vec{x}_0
+$$
+
+$$
+X=GU + H\vec{x}_0
+$$
+
+$$
+\bar{Q} = \underbrace{\begin{pmatrix}Q & & \\ & \ddots & \\ & & Q\end{pmatrix}}_{N+1}
+\qquad
+\bar{R} = \underbrace{\begin{pmatrix}R & & \\ & \ddots & \\ & & R\end{pmatrix}}_{N}
+$$
+
+$$
+J(X,U) = X^\top\bar{Q}X + U^\top\bar{R}U
+$$
+
+
+$$
+\begin{array}{l}
+\min J(X,U)\\
+s.t.\quad X=GU + H\vec{x}_0
+\end{array}
+$$
+\fi
+
+\begin{align*}
+J(\vec{x}_0, U) & = (GU + H\vec{x}_0)^\top\bar{Q}(GU + H\vec{x}_0)+U^\top\bar{R}U=\\
+& = U^\top(G^\top\bar{Q}G + \bar{R})U + U^\top G^\top \bar{Q}^\top H\vec{x}_0 + \vec{x}_0^\top H^\top \bar{Q} G U + \vec{x}_0^\top H^\top \bar{Q} H \vec{x}_0 = \\
+& = U^\top(G^\top\bar{Q}G + \bar{R})U + 2 \vec{x}_0^\top H^\top \bar{Q} G U + \vec{x}_0^\top H^\top \bar{Q} H \vec{x}_0 
+\end{align*}
+
+\begin{align*}
+\alpha = x^\top A x & \Rightarrow \frac{\partial \alpha}{\partial x} = x^\top (A^\top + A)\\
+\alpha = y^\top A x & \Rightarrow \frac{\partial \alpha}{\partial x} = y^\top A\\
+\end{align*}
+
+$$
+\frac{\partial J(\vec{x}_0,U)}{\partial U} = 2 U^\top(G^\top\bar{Q}G + \bar{R}) + 2 \vec{x}_0^\top H^\top \bar{Q} G = \vec{0}
+$$
+
+$$
+U^* = \underbrace{-(G^\top\bar{Q}G + \bar{R})^{-1}G^\top\bar{Q}H}_{:=K}\vec{x}_0
+$$
+
+\end{document}
+
+

@@ -1,0 +1,20 @@
+\documentclass{article}
+\usepackage{amssymb,amsmath}
+\begin{document}
+\thispagestyle{empty}
+$$
+\begin{pmatrix}\vec{x}_0\\ \vec{x}_1 \\ \vdots \\ \vec{x}_N\end{pmatrix} =
+\underbrace{\begin{pmatrix}
+\vec{0}  & \vec{0}  & \vec{0}  & \dots  & \vec{0} \\
+B        & \vec{0}  & \vec{0}  & \dots  & \vec{0} \\
+AB       & B        & \vec{0}  & \dots  & \vec{0} \\
+\vdots   &          &          & \ddots & \vdots  \\
+A^{N-1}B & A^{N-2}B & A^{N-3}B & \dots  & B       \\
+\end{pmatrix}}_{:= G}
+\begin{pmatrix}\vec{u}_0\\ \vec{u}_1 \\ \vdots \\ \vec{u}_{N-1}\end{pmatrix} 
++
+\underbrace{\begin{pmatrix}I_{N\times N}\\A\\A^2\\\vdots\\A^N\end{pmatrix}}_{:= H}\vec{x}_0
+$$
+\end{document}
+
+

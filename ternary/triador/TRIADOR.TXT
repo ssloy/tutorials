@@ -1,36 +1,36 @@
- ══════════════════════════════════════════════════════════════════════════
-              Description of the ternary computer TRIADOR
- ══════════════════════════════════════════════════════════════════════════
+ ══════════════════════════════════════════════════════════
+        Description of the ternary computer TRIADOR
+ ══════════════════════════════════════════════════════════
   General purpose
      registers
  trits 2 1 0  (a trit can take -1,0,+1 values)
       ┌─┬─┬─┐
     R1│ │ │ │ \
-      ├─┼─┼─┤ |                                      Program memory:
-    R2│ │ │ │ |                                            4 3 2 1 0 : trits
-      ├─┼─┼─┤ |-- main set of registers            address┌─┬─┬─┬─┬─┐
-    R3│ │ │ │ |                                       -364│ │ │ │ │ │
-      ├─┼─┼─┤ |                                           ├─┼─┼─┼─┼─┤
-    R4│ │ │ │ /                                       -363│ │ │ │ │ │
-      ├─┼─┼─┤                                             ├─┼─┼─┼─┼─┤
-    R5│ │ │ │ \                                       -362│ │ │ │ │ │
-      ├─┼─┼─┤ |                                           ├─┼─┼─┼─┼─┤
-    R6│ │ │ │ |                                           : : : : : :
-      ├─┼─┼─┤ |                                           ├─┼─┼─┼─┼─┤
-    R7│ │ │ │ |                                        -1 │ │ │ │ │ │
-      ├─┼─┼─┤ |                                           ├─┼─┼─┼─┼─┤
-    R8│ │ │ │ |                                         0 │ │ │ │ │ │
-      ├─┼─┼─┤ |-- extra registers                         ├─┼─┼─┼─┼─┤
-    R9│ │ │ │ |                                        +1 │ │ │ │ │ │
-      ├─┼─┼─┤ |                                           ├─┼─┼─┼─┼─┤
-   R10│ │ │ │ |                                           : : : : : :
-      ├─┼─┼─┤ |                                           ├─┼─┼─┼─┼─┤
-   R11│ │ │ │ |                                       +363│ │ │ │ │ │
-      ├─┼─┼─┤ |                                           ├─┼─┼─┼─┼─┤
-   R12│ │ │ │ /                                       +364│ │ │ │ │ │
-      ├─┼─┼─┤                                             └─┴─┴─┴─┴─┘
-   R13│ │ │ │ PC takes program memory segment value from this register for JP ttt
-      └─┴─┴─┘
+      ├─┼─┼─┤ |                              Program memory
+    R2│ │ │ │ |                            trits 4 3 2 1 0
+      ├─┼─┼─┤ |-- main set                      ┌─┬─┬─┬─┬─┐
+    R3│ │ │ │ |   of registers           a  -364│ │ │ │ │ │
+      ├─┼─┼─┤ |                          d      ├─┼─┼─┼─┼─┤
+    R4│ │ │ │ /                          d  -363│ │ │ │ │ │
+      ├─┼─┼─┤                            r      ├─┼─┼─┼─┼─┤
+    R5│ │ │ │ \                          e  -362│ │ │ │ │ │
+      ├─┼─┼─┤ |                          s      ├─┼─┼─┼─┼─┤
+    R6│ │ │ │ |                          s      : : : : : :
+      ├─┼─┼─┤ |                                 ├─┼─┼─┼─┼─┤
+    R7│ │ │ │ |                              -1 │ │ │ │ │ │
+      ├─┼─┼─┤ |                                 ├─┼─┼─┼─┼─┤
+    R8│ │ │ │ |                               0 │ │ │ │ │ │
+      ├─┼─┼─┤ |-- extra registers               ├─┼─┼─┼─┼─┤
+    R9│ │ │ │ |                              +1 │ │ │ │ │ │
+      ├─┼─┼─┤ |                                 ├─┼─┼─┼─┼─┤
+   R10│ │ │ │ |                                 : : : : : :
+      ├─┼─┼─┤ |                                 ├─┼─┼─┼─┼─┤
+   R11│ │ │ │ |                             +363│ │ │ │ │ │
+      ├─┼─┼─┤ |                                 ├─┼─┼─┼─┼─┤
+   R12│ │ │ │ /                             +364│ │ │ │ │ │
+      ├─┼─┼─┤                                   └─┴─┴─┴─┴─┘
+   R13│ │ │ │ Special register,
+      └─┴─┴─┘ specifies memory segment for JP ttt
       ┌─┬─┬─┬─┬─┬─┐
    PC │ │ │ │ │ │ │ program counter register (-364..+364)
       └─┴─┴─┴─┴─┴─┘
@@ -44,34 +44,35 @@
 
   where t0,t1,t2 - trits (-1,0,+1)
 
- ══════════════════════════════════════════════════════════════════════════
-                        TRIADOR instruction set
- ══════════════════════════════════════════════════════════════════════════
+ ═══════════════════════════════════════════════════════════
+                 TRIADOR instruction set
+ ═══════════════════════════════════════════════════════════
   (for lisibility we use N,O,P instead of -1,0,+1)
-  ┌───────┬────────────┬─────────────────────────────────────────┐
-  │op code│  mnemonic  │ description                             │
-  ├───────┼────────────┼─────────────────────────────────────────┤
-  │ NNttt │   EX ttt   │ extension commands (work in progress)   │
-  ├───────┼────────────┼─────────────────────────────────────────┤
-  │ NOttt │   JP ttt   │ unconditional jump to R13*27+ttt        │
-  ├───────┼────────────┼─────────────────────────────────────────┤
-  │ NPttt │   SK ttt   │ conditional skips of the next command   │
-  ├───────┼────────────┼─────────────────────────────────────────┤
-  │ ONttt │   OP ttt   │ tritwise unary operation over R1        │
-  ├───────┼────────────┼─────────────────────────────────────────┤
-  │ OOttt │   RR ttt   │ copying between registers               │
-  ├───────┼────────────┼─────────────────────────────────────────┤
-  │ OPttt │   R1 ttt   │ write ttt to the register R1            │
-  ├───────┼────────────┼─────────────────────────────────────────┤
-  │ PNttt │   R2 ttt   │ write ttt to the register R2            │
-  ├───────┼────────────┼─────────────────────────────────────────┤
-  │ POttt │   R3 ttt   │ write ttt to the register R3            │
-  ├───────┼────────────┼─────────────────────────────────────────┤
-  │ PPttt │   R4 ttt   │ write ttt to the register R4            │
-  └───────┴────────────┴─────────────────────────────────────────┘
+  ┌───────┬────────┬───────────────────────────────────────┐
+  │op code│mnemonic│ description                           │
+  ├───────┼────────┼───────────────────────────────────────┤
+  │ NNttt │ EX ttt │ extension commands (work in progress) │
+  ├───────┼────────┼───────────────────────────────────────┤
+  │ NOttt │ JP ttt │ unconditional jump to R13*27+ttt      │
+  ├───────┼────────┼───────────────────────────────────────┤
+  │ NPttt │ SK ttt │ conditional skips of the next command │
+  ├───────┼────────┼───────────────────────────────────────┤
+  │ ONttt │ OP ttt │ tritwise unary operation over R1      │
+  ├───────┼────────┼───────────────────────────────────────┤
+  │ OOttt │ RR ttt │ copying between registers             │
+  ├───────┼────────┼───────────────────────────────────────┤
+  │ OPttt │ R1 ttt │ write ttt to the register R1          │
+  ├───────┼────────┼───────────────────────────────────────┤
+  │ PNttt │ R2 ttt │ write ttt to the register R2          │
+  ├───────┼────────┼───────────────────────────────────────┤
+  │ POttt │ R3 ttt │ write ttt to the register R3          │
+  ├───────┼────────┼───────────────────────────────────────┤
+  │ PPttt │ R4 ttt │ write ttt to the register R4          │
+  └───────┴────────┴───────────────────────────────────────┘
 
   Additional comments:
-  - ttt means a 3-trit number with values from NNN (-13) to PPP (+13)
+  - ttt means a 3-trit number with values
+    from NNN (-13) to PPP (+13)
 
   - RR ttt instruction copies a register to/from R1 or performs
     an increment/decrement over R1
@@ -103,8 +104,8 @@
     OOPPO — copy R12 to R1
     OOPPP — copy R13 to R1
 
-  - SK ttt skips one instruction depending on the sign of R1,R2,R3,R4 or
-    the borrow/carry flag C:
+  - SK ttt skips one instruction depending on
+    the sign of R1,R2,R3,R4 or the borrow/carry flag C:
     NPNNN - skip if R4 >= 0
     NPNNO - skip if R4 != 0
     NPNNP - skip if R4 <= 0

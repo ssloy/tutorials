@@ -1,0 +1,26 @@
+\documentclass[A4,11pt]{article}
+
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+
+
+\usepackage{amsmath,amssymb,amsfonts}
+
+
+\begin{document}
+\thispagestyle{empty}
+
+\begin{tabular}{cccccc}
+\multicolumn{2}{c}{Ставки Агента 2}  &  \multicolumn{4}{c}{Результат для Агента 1} \\
+\hline
+{\tiny Событие} & {\tiny Сумма ставки} & {\tiny $a\wedge b$} & {\tiny $a\wedge \neg b$} &  {\tiny $\neg a\wedge b$} &  {\tiny $\neg a\wedge\neg b$} \\
+\hline
+$a$             & 4-6 & -6 & -6 &  4 &  4 \\
+$b$             & 3-7 & -7 &  3 & -7 &  3 \\
+$\neg(a\vee b)$ & 2-8 &  2 &  2 &  2 & -8 \\
+\hline
+                &     &-11 & -1 & -1 & -1
+\end{tabular}
+\end{document}
+

@@ -5,7 +5,10 @@
 \usepackage{amsmath,amssymb,amsfonts}
 \begin{document}
 \thispagestyle{empty}
-$$
-\frac{\partial\mathcal{L}}{\partial R}    =  \frac{1}{\sigma^2}\sum\limits_{j=1}^N (U_j- R I_j) = 0 
-$$
+
+\begin{align*}
+\frac{\partial\mathcal{L}}{\partial R} &=  -\frac{1}{2\sigma^2}\sum\limits_{j=1}^N -2I_j (U_j- R I_j) = \\
+                                       &= \frac{1}{\sigma^2}\left(\sum\limits_{j=1}^N I_jU_j - R\sum\limits_{j=1}^N I_j\right) = 0
+\end{align*}
+
 \end{document}

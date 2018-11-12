@@ -1,0 +1,57 @@
+\documentclass[A4,11pt]{article}
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+\usepackage{amsmath,amssymb,amsfonts}
+\begin{document}
+\thispagestyle{empty}
+
+$$
+\{U_j\}_{j=1}^{N}
+$$
+
+$$
+p(U_j) = \frac{1}{\sqrt{2\pi}\sigma} \exp\left(-\frac{(U_j-U)^2}{2\sigma^2}\right)
+$$
+
+\begin{align*}
+\log \mathcal{L}(U,\sigma) & = \log \left(\prod\limits_{j=1}^N  \frac{1}{\sqrt{2\pi}\sigma} \exp\left(-\frac{(U_j-U)^2}{2\sigma^2}\right)\right) =\\
+& = \sum\limits_{j=1}^N \log \left(\frac{1}{\sqrt{2\pi}\sigma} \exp\left(-\frac{(U_j-U)^2}{2\sigma^2}\right)\right) = \\
+& = \sum\limits_{j=1}^N \left(\log \left(\frac{1}{\sqrt{2\pi}\sigma}\right) -\frac{(U_j-U)^2}{2\sigma^2}\right) = \\
+& = -N \left(\log\sqrt{2\pi} + \log\sigma\right) - \frac{1}{2\sigma^2} \sum\limits_{j=1}^N (U_j-U)^2
+\end{align*}
+
+$$
+\frac{\partial\mathcal{L}}{\partial U}    =  \frac{1}{\sigma^2}\sum\limits_{j=1}^N (U_j-U) = 0 
+$$
+
+$$
+U = \frac{\sum\limits_{j=1}^N U_j}{N}
+$$
+
+$$
+\frac{\partial\mathcal{L}}{\partial\sigma} =  -\frac{N}{\sigma} + \frac{1}{\sigma^3}\sum\limits_{j=1}^N (U_j-U)^2 = 0
+$$
+
+$$
+\sigma = \sqrt{\frac{\sum\limits_{j=1}^N (U_j-U)^2}{N}} 
+$$
+
+$$
+\{I_j, U_j\}_{j=1}^{N}
+$$
+
+\begin{align*}
+\log \mathcal{L}(R,\sigma) & = \log \left(\prod\limits_{j=1}^N  \frac{1}{\sqrt{2\pi}\sigma} \exp\left(-\frac{(U_j-R I_j)^2}{2\sigma^2}\right)\right) =\\
+& = -N \left(\log\sqrt{2\pi} + \log\sigma\right) - \frac{1}{2\sigma^2} \sum\limits_{j=1}^N (U_j- R I_j)^2
+\end{align*}
+
+$$
+\frac{\partial\mathcal{L}}{\partial R}    =  \frac{1}{\sigma^2}\sum\limits_{j=1}^N (U_j- R I_j) = 0 
+$$
+
+$$
+R = \frac{\sum\limits_{j=1}^N U_j}{\sum\limits_{j=1}^N I_j}
+$$
+
+\end{document}

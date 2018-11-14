@@ -5,14 +5,14 @@ import matplotlib.animation as animation
 fig, ax = plt.subplots()
 
 #x = np.arange(0., 1., 0.01)
-n = 100
-f = [0.] * n 
-g = [0.] * n 
+n = 8
+f = [0.] * n
 lock = [0, n*57//100, n-1]
 lval = [1., 2., 1.]
 for i in range(len(lock)):
     f[lock[i]] = lval[i]
 
+'''
 A = np.matrix(np.zeros((n, n)))
 b = np.matrix(np.zeros((n, 1)))
 for i in range(n):
@@ -23,30 +23,39 @@ for i in range(n):
         A[i, i-1] = -.5
         A[i, i]   =  1.
         A[i, i+1] = -.5
+'''
 
 #print(A,b)
 #f = ((np.linalg.inv(A)*b).transpose().tolist()[0]) 
 
-lines = [ax.plot(f, drawstyle='steps-mid')[0], ax.plot(g, drawstyle='steps-mid')[0]]
-
-def init():  # only required for blitting to give a clean slate.
-    for line in lines:
-        line.set_ydata([np.nan] * n)
-    return lines
+lines = [ax.plot(range(n), f, drawstyle='steps-mid')[0]]
+#ax.grid()
 
 def animate(i):
-    global f, g
+    global f, n, lock
 
+    norm = 0
     for i in range(n):
         if i in lock: continue
-        g[i] = (f[i-1]+f[i+1])/2. - f[i]
+        val = (f[i-1]+f[i+1]+11./n**2)/2.
+        norm += np.abs(f[i]-val)
+        f[i] = val
 
-    f = [sum(x) for x in zip(f, g)]
-    lines[0].set_ydata(f)  # update the data.
-#    lines[1].set_ydata([1.*v for v in g])  # update the data.
+    if (n<1000 and norm<1e-2):
+        f = [val for val in f for _ in (0, 1)]
+        n *= 2
+        lock = [0, n*57//100, n-1]
+        for i in range(len(lock)):
+            f[lock[i]] = lval[i]
+
+    print(norm)
+
+    lines[0].set_data(range(n), f)  # update the data.
+    ax.relim()
+    ax.autoscale_view(False,True,False)
     return lines
 
-ani = animation.FuncAnimation(fig, animate, init_func=init, frames=np.arange(0, 100), interval=1, blit=True, save_count=50)
+ani = animation.FuncAnimation(fig, animate, frames=np.arange(0, 100), interval=100, blit=False, save_count=50)
 
 #ani.save('line.gif', dpi=80, writer='imagemagick')
 

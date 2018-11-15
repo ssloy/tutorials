@@ -28,10 +28,10 @@ for i in range(n):
 #print(A,b)
 #f = ((np.linalg.inv(A)*b).transpose().tolist()[0]) 
 
-lines = [ax.plot(range(n), f, drawstyle='steps-mid')[0]]
+lines = [ax.plot(range(n), f, drawstyle='steps-mid')[0], ax.text(0.05, 0.05, "gna", transform=ax.transAxes, fontsize=14,bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5))]
 #ax.grid()
 
-def animate(i):
+def animate(iteration):
     global f, n, lock
 
     norm = 0
@@ -48,14 +48,16 @@ def animate(i):
         for i in range(len(lock)):
             f[lock[i]] = lval[i]
 
-    print(norm)
+    print(iteration, norm)
 
     lines[0].set_data(range(n), f)  # update the data.
+    lines[1].set_text("Iteration #" + str(iteration))
+    plt.draw()
     ax.relim()
     ax.autoscale_view(False,True,False)
     return lines
 
-ani = animation.FuncAnimation(fig, animate, frames=np.arange(0, 100), interval=100, blit=False, save_count=50)
+ani = animation.FuncAnimation(fig, animate, frames=np.arange(0, 1000), interval=1, blit=False, save_count=50)
 
 #ani.save('line.gif', dpi=80, writer='imagemagick')
 

@@ -12,7 +12,6 @@ lval = [1., 2., 1.]
 for i in range(len(lock)):
     f[lock[i]] = lval[i]
 
-'''
 A = np.matrix(np.zeros((n, n)))
 b = np.matrix(np.zeros((n, 1)))
 for i in range(n):
@@ -23,25 +22,35 @@ for i in range(n):
         A[i, i-1] = -.5
         A[i, i]   =  1.
         A[i, i+1] = -.5
-'''
 
-#print(A,b)
+print(A,b)
 #f = ((np.linalg.inv(A)*b).transpose().tolist()[0]) 
 
-lines = [ax.plot(range(n), f, drawstyle='steps-mid')[0], ax.text(0.05, 0.05, "gna", transform=ax.transAxes, fontsize=14,bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5))]
+lines = [ax.plot(range(n), f, drawstyle='steps-mid')[0], ax.text(0.05, 0.05, "Iteration #0", transform=ax.transAxes, fontsize=14,bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5))]
+plt.draw()
 #ax.grid()
 
 def animate(iteration):
     global f, n, lock
+    if (0==iteration):
+        return lines
 
     norm = 0
     for i in range(n):
+#       if (0==i):
+#           f[0] = f[1]
+#           continue
+#       if (i==n-1):
+#           f[n-1] = f[n-2]
+#           continue
+
         if i in lock: continue
         val = (f[i-1]+f[i+1]+11./n**2)/2.
+#        val = (f[i-1]+f[i+1])/2.
         norm += np.abs(f[i]-val)
         f[i] = val
 
-    if (n<1000 and norm<1e-2):
+    if 1 and (n<1000 and norm<1e-2):
         f = [val for val in f for _ in (0, 1)]
         n *= 2
         lock = [0, n*57//100, n-1]
@@ -57,9 +66,8 @@ def animate(iteration):
     ax.autoscale_view(False,True,False)
     return lines
 
-ani = animation.FuncAnimation(fig, animate, frames=np.arange(0, 1000), interval=1, blit=False, save_count=50)
-
-#ani.save('line.gif', dpi=80, writer='imagemagick')
+ani = animation.FuncAnimation(fig, animate, frames=np.arange(0, 150), interval=100, blit=False, save_count=50)
+ani.save('line.gif', dpi=80, writer='imagemagick')
 
 # To save the animation, use e.g.
 #

@@ -5,26 +5,12 @@
 #include <cassert>
 #include <iostream>
 
-template<size_t DimCols,size_t DimRows,typename T> class mat;
-
 template <size_t DIM, typename T> struct vec {
     vec() { for (size_t i=DIM; i--; data_[i] = T()); }
           T& operator[](const size_t i)       { assert(i<DIM); return data_[i]; }
     const T& operator[](const size_t i) const { assert(i<DIM); return data_[i]; }
 private:
     T data_[DIM];
-};
-
-/////////////////////////////////////////////////////////////////////////////////
-
-template <typename T> struct vec<2,T> {
-    vec() : x(T()), y(T()) {}
-    vec(T X, T Y) : x(X), y(Y) {}
-    template <class U> vec<2,T>(const vec<2,U> &v);
-          T& operator[](const size_t i)       { assert(i<2); return i<=0 ? x : y; }
-    const T& operator[](const size_t i) const { assert(i<2); return i<=0 ? x : y; }
-
-    T x,y;
 };
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -94,8 +80,7 @@ template <size_t DIM, typename T> std::ostream& operator<<(std::ostream& out, ve
 
 /////////////////////////////////////////////////////////////////////////////////
 
-typedef vec<2,  float> Vec2f;
-typedef vec<3,  float> Vec3f;
+typedef vec<3,float> Vec3f;
 
 #endif //__GEOMETRY_H__
 

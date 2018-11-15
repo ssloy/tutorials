@@ -74,7 +74,7 @@ void print_obj() {
 }
 
 int main() {
-    load_obj("face.obj");
+    load_obj("input-face.obj");
 
     std::vector<Vec3f> curvature(verts.size(), Vec3f(0,0,0));
     for (int i=0; i<(int)verts.size(); i++) {

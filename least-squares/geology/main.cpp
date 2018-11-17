@@ -1,9 +1,9 @@
 #include <vector>
 #include <iostream>
-
 #include "geometry.h"
 #include "model.h"
 #include "tgaimage.h"
+#include "OpenNL_psm.h"
 
 const int width  = 1280;
 const int height = 1280;
@@ -16,27 +16,6 @@ const TGAColor magenta(255,   0, 255, 255);
 const TGAColor colors[] = {green, blue, yellow, magenta};
 const int ncolors = sizeof(colors)/sizeof(TGAColor);
 
-// well, a line is a line, no tricks here
-void line(Vec2i a, Vec2i b, TGAImage &image, TGAColor color) {
-    bool steep = false;
-    if (std::abs(a.x-b.x)<std::abs(a.y-b.y)) {
-        std::swap(a.x, a.y);
-        std::swap(b.x, b.y);
-        steep = true;
-    }
-    if (a.x>b.x) {
-        std::swap(a, b);
-    }
-    for (int x=a.x; x<=b.x; x++) {
-        float t = (x-a.x)/(float)(b.x-a.x);
-        int y = a.y*(1.-t) + b.y*t;
-        if (steep) {
-            image.set(y, x, color);
-        } else {
-            image.set(x, y, color);
-        }
-    }
-}
 
 bool is_edge_present(Vec3f v1, Vec3f v2, Model &m) {
     for (int j=0; j<m.nhalfedges(); j++) {
@@ -66,7 +45,7 @@ int main(int argc, char** argv) {
         Vec3f v[2] = { m[0].point(m[0].from(i)), m[0].point(m[0].to(i)) };
         TGAColor color = white;
 
-        bool fault = m.size()<2 || is_edge_present(v[0], v[1], m[1]);
+        bool fault = m.size()>=2 && is_edge_present(v[0], v[1], m[1]);
 
         int horizon = -1;
         for (int j=2; j<(int)m.size(); j++) {
@@ -84,7 +63,7 @@ int main(int argc, char** argv) {
             s[j] = Vec2i(v[j].x*width, v[j].y*height);
         }
 
-        line(s[0], s[1], frame, color);
+        frame.line(s[0], s[1], color);
     }
 
     frame.write_tga_file("framebuffer.tga");

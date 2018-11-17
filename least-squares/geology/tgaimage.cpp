@@ -3,6 +3,7 @@
 #include <string.h>
 #include <time.h>
 #include <math.h>
+#include "geometry.h"
 #include "tgaimage.h"
 
 TGAImage::TGAImage() : data(NULL), width(0), height(0), bytespp(0) {}
@@ -352,5 +353,26 @@ bool TGAImage::scale(int w, int h) {
     width = w;
     height = h;
     return true;
+}
+
+void TGAImage::line(Vec2i a, Vec2i b, TGAColor &color) {
+    bool steep = false;
+    if (std::abs(a.x-b.x)<std::abs(a.y-b.y)) {
+        std::swap(a.x, a.y);
+        std::swap(b.x, b.y);
+        steep = true;
+    }
+    if (a.x>b.x) {
+        std::swap(a, b);
+    }
+    for (int x=a.x; x<=b.x; x++) {
+        float t = (x-a.x)/(float)(b.x-a.x);
+        int y = a.y*(1.-t) + b.y*t;
+        if (steep) {
+            set(y, x, color);
+        } else {
+            set(x, y, color);
+        }
+    }
 }
 

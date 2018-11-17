@@ -36,7 +36,7 @@ int main(int argc, char** argv) {
     }
 
 
-    for (int iter=0; iter<5; iter++) {
+    for (int iter=0; iter<10; iter++) {
         for (int d=0; d<3; d++) {
             nlNewContext();
             nlSolverParameteri(NL_NB_VARIABLES, m.nverts());
@@ -45,7 +45,10 @@ int main(int argc, char** argv) {
             nlBegin(NL_MATRIX);
 
             for (int i=0; i<m.nhalfedges(); i++) {
-                if (d!=nearest_axis[i/3]/2) continue;
+                int axis = nearest_axis[i/3]/2;
+                if (d!=axis) continue;
+//                if (m.opp(i) && nearest_axis[(m.opp(i))/3]/2!=a) continue;
+
                 int v1 = m.from(i);
                 int v2 = m.to(i);
                 nlBegin(NL_ROW);
@@ -54,7 +57,6 @@ int main(int argc, char** argv) {
                 nlEnd(NL_ROW);
             }
 
-            //        nlRowScaling(1.);
             for (int i=0; i<m.nverts(); i++) {
                 nlBegin(NL_ROW);
                 nlCoefficient(i, 1);
@@ -69,6 +71,39 @@ int main(int argc, char** argv) {
             for (int i=0; i<m.nverts(); i++) {
                 m.point(i)[d] = nlGetVariable(i);
             }
+        }
+    }
+
+
+    for (int d=0; d<3; d++) {
+        nlNewContext();
+        nlSolverParameteri(NL_NB_VARIABLES, m.nverts());
+        nlSolverParameteri(NL_LEAST_SQUARES, NL_TRUE);
+        nlBegin(NL_SYSTEM);
+        nlBegin(NL_MATRIX);
+
+        for (int i=0; i<m.nhalfedges(); i++) {
+            int v1 = m.from(i);
+            int v2 = m.to(i);
+            nlBegin(NL_ROW);
+            nlCoefficient(v1,  1);
+            nlCoefficient(v2, -1);
+            nlEnd(NL_ROW);
+        }
+
+        for (int i=0; i<m.nverts(); i++) {
+            nlBegin(NL_ROW);
+            nlCoefficient(i, 3);
+            nlRightHandSide(3*m.point(i)[d]);
+            nlEnd(NL_ROW);
+        }
+
+        nlEnd(NL_MATRIX);
+        nlEnd(NL_SYSTEM);
+        nlSolve();
+
+        for (int i=0; i<m.nverts(); i++) {
+            m.point(i)[d] = nlGetVariable(i);
         }
     }
 

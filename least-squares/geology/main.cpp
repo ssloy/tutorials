@@ -60,7 +60,25 @@ int main(int argc, char** argv) {
         }
     }
 
-    if (0) {
+    std::vector<int> fault_partner(m[0].nhalfedges(), -1);
+    for (int i=0; i<m[0].nhalfedges(); i++) {
+        Vec3f v1 = m[0].point(m[0].from(i));
+        Vec3f v2 = m[0].point(m[0].to  (i));
+        if (!faults[i]) continue;
+        for (int j=0; j<m[0].nhalfedges(); j++) {
+            if (!faults[j]) continue;
+            Vec3f u1 = m[0].point(m[0].from(j));
+            Vec3f u2 = m[0].point(m[0].to  (j));
+            float threshold = 1e-3;
+            if ((u1-v2).norm()<threshold && (u2-v1).norm()<threshold) {
+                fault_partner[i] = j;
+                fault_partner[j] = i;
+                break;
+            }
+        }
+    }
+
+    if (1) {
         nlNewContext();
         nlSolverParameteri(NL_NB_VARIABLES, m[0].nverts());
         nlSolverParameteri(NL_LEAST_SQUARES, NL_TRUE);
@@ -70,6 +88,34 @@ int main(int argc, char** argv) {
         for (int i=0; i<m[0].nhalfedges(); i++) {
             int v1 = m[0].from(i);
             int v2 = m[0].to(i);
+
+            if (faults[i] && fault_partner[i]>=0 && i<fault_partner[i]) {
+                int u1 = m[0].from(fault_partner[i]);
+                int u2 = m[0].to(fault_partner[i]);
+                float scale = 30;
+                nlBegin(NL_ROW);
+                nlCoefficient(v1,  scale);
+                nlCoefficient(u2, -scale);
+                nlEnd(NL_ROW);
+                nlBegin(NL_ROW);
+                nlCoefficient(v2,  scale);
+                nlCoefficient(u1, -scale);
+                nlEnd(NL_ROW);
+                continue;
+            }
+            float dot = (m[0].point(v2)-m[0].point(v1)).normalize()*Vec3f(0,1,0);
+            if (m[0].opp(i)<0 && fabs(dot)>0.99) {
+                float scale = .3;
+                nlBegin(NL_ROW);
+                nlCoefficient(v1,  scale);
+                nlRightHandSide(dot>0?scale:0);
+                nlEnd(NL_ROW);
+                nlBegin(NL_ROW);
+                nlCoefficient(v2,  scale);
+                nlRightHandSide(dot>0?scale:0);
+                nlEnd(NL_ROW);
+                continue;
+            }
             nlBegin(NL_ROW);
             if (faults[i]) {
                 nlCoefficient(v1,  100);
@@ -90,8 +136,7 @@ int main(int argc, char** argv) {
         }
     }
 
-    for (float scale = .02; scale<10; scale *= 4) 
-    {
+    if (1) {
         nlNewContext();
         nlSolverParameteri(NL_NB_VARIABLES, m[0].nverts()+nhorizons);
         nlSolverParameteri(NL_LEAST_SQUARES, NL_TRUE);
@@ -101,35 +146,52 @@ int main(int argc, char** argv) {
         for (int i=0; i<m[0].nhalfedges(); i++) {
             int v1 = m[0].from(i);
             int v2 = m[0].to(i);
-            float dot = (m[0].point(v2)-m[0].point(v1)).normalize()*Vec3f(1,0,0);
-            if (m[0].opp(i)<0 && fabs(dot)>0.99) {
-                float scale = 30;
+
+            if (0&& faults[i] && fault_partner[i]>=0 && i<fault_partner[i]) {
+                int u1 = m[0].from(fault_partner[i]);
+                int u2 = m[0].to(fault_partner[i]);
+                float scale = 0.3;
                 nlBegin(NL_ROW);
                 nlCoefficient(v1,  scale);
-                nlRightHandSide(dot>0?scale:0);
+                nlCoefficient(u2, -scale);
                 nlEnd(NL_ROW);
                 nlBegin(NL_ROW);
                 nlCoefficient(v2,  scale);
-                nlRightHandSide(dot>0?scale:0);
+                nlCoefficient(u1, -scale);
                 nlEnd(NL_ROW);
-            } else {
-                if (horizon[i]>=0) {
-                    nlBegin(NL_ROW);
-                    nlCoefficient(v1,  scale);
-                    nlCoefficient(m[0].nverts()+horizon[i], -scale);
-                    nlEnd(NL_ROW);
-                    nlBegin(NL_ROW);
-                    nlCoefficient(v2,  scale);
-                    nlCoefficient(m[0].nverts()+horizon[i], -scale);
-                    nlEnd(NL_ROW);
-                } else {
-                    nlBegin(NL_ROW);
-                    nlCoefficient(v1,  1);
-                    nlCoefficient(v2, -1);
-                    nlRightHandSide(m[0].point(v1).y-m[0].point(v2).y);
-                    nlEnd(NL_ROW);
-                }
+                continue;
             }
+
+            float dot = (m[0].point(v2)-m[0].point(v1)).normalize()*Vec3f(1,0,0);
+            if (m[0].opp(i)<0 && fabs(dot)>0.99) {
+                float scale = .3;
+                nlBegin(NL_ROW);
+                nlCoefficient(v1,  scale);
+                nlRightHandSide(dot<0?scale:0);
+                nlEnd(NL_ROW);
+                nlBegin(NL_ROW);
+                nlCoefficient(v2,  scale);
+                nlRightHandSide(dot<0?scale:0);
+                nlEnd(NL_ROW);
+                continue;
+            }
+            if (horizon[i]>=0) {
+                float scale = 30;
+                nlBegin(NL_ROW);
+                nlCoefficient(v1,  scale);
+                nlCoefficient(m[0].nverts()+horizon[i], -scale);
+                nlEnd(NL_ROW);
+                nlBegin(NL_ROW);
+                nlCoefficient(v2,  scale);
+                nlCoefficient(m[0].nverts()+horizon[i], -scale);
+                nlEnd(NL_ROW);
+                continue;
+            } 
+            nlBegin(NL_ROW);
+            nlCoefficient(v1,  1);
+            nlCoefficient(v2, -1);
+            nlRightHandSide(m[0].point(v1).y-m[0].point(v2).y);
+            nlEnd(NL_ROW);
         }
 
         nlEnd(NL_MATRIX);
@@ -139,7 +201,6 @@ int main(int argc, char** argv) {
             m[0].point(i).y = nlGetVariable(i);
         }
     }
-
 
     // draw the mesh
 
@@ -160,6 +221,7 @@ int main(int argc, char** argv) {
     }
 
     frame.write_tga_file("framebuffer.tga");
+    std::cout << m[0];
     return 0;
 }
 

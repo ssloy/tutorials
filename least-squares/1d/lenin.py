@@ -36,13 +36,13 @@ def animate(iteration):
     i = iteration
     if (iteration>100):
         i = (i-100)*10+100
-    lines[1].set_text("Iteration #" + str(i))
+    lines[1].set_text("Iteration #" + str(i) +" of " + str((200-100)*10+100))
     plt.draw()
     ax.relim()
     ax.autoscale_view(False,True,True)
     return lines
 
-ani = animation.FuncAnimation(fig, animate, frames=np.arange(0, 400), interval=1, blit=False, save_count=50)
+ani = animation.FuncAnimation(fig, animate, frames=np.arange(0, 200), interval=1, blit=False, save_count=50)
 ani.save('line.gif', dpi=80, writer='imagemagick')
 plt.show()
 

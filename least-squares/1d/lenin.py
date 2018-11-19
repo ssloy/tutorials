@@ -22,18 +22,27 @@ def animate(iteration):
     global x, y
     print(iteration)
 
-    for i in range(0,n):
-        x[i] = (x[(i-1+n)%n]+x[(i+1)%n])/2. + 0.*cx[i] # play with the coeff here, 0. by default
-        y[i] = (y[(i-1+n)%n]+y[(i+1)%n])/2. + 0.*cy[i]
+    if (iteration>100):
+        for iter in range(0,10):
+            for i in range(0,n):
+                x[i] = (x[(i-1+n)%n]+x[(i+1)%n])/2. + 0.*cx[i] # play with the coeff here, 0. by default
+                y[i] = (y[(i-1+n)%n]+y[(i+1)%n])/2. + 0.*cy[i]
+    else:
+        for i in range(0,n):
+            x[i] = (x[(i-1+n)%n]+x[(i+1)%n])/2. + 0.*cx[i] # play with the coeff here, 0. by default
+            y[i] = (y[(i-1+n)%n]+y[(i+1)%n])/2. + 0.*cy[i]
 
     lines[0].set_data(x, y)  # update the data.
-    lines[1].set_text("Iteration #" + str(iteration))
+    i = iteration
+    if (iteration>100):
+        i = (i-100)*10+100
+    lines[1].set_text("Iteration #" + str(i))
     plt.draw()
     ax.relim()
     ax.autoscale_view(False,True,True)
     return lines
 
-ani = animation.FuncAnimation(fig, animate, frames=np.arange(0, 100), interval=1, blit=False, save_count=50)
-#ani.save('line.gif', dpi=80, writer='imagemagick')
+ani = animation.FuncAnimation(fig, animate, frames=np.arange(0, 400), interval=1, blit=False, save_count=50)
+ani.save('line.gif', dpi=80, writer='imagemagick')
 plt.show()
 

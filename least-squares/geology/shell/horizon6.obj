@@ -1,0 +1,473 @@
+# vorpaline algo:delaunay=NN
+# vorpaline algo:hole_filling=loop_split
+# vorpaline algo:nn_search=BNN
+# vorpaline algo:parallel=true
+# vorpaline algo:predicates=fast
+# vorpaline algo:reconstruct=Co3Ne
+# vorpaline base_modules=luagrob;mesh;voxel
+# vorpaline batch=false
+# vorpaline biblio=false
+# vorpaline biblio:command_line=false
+# vorpaline co3ne=false
+# vorpaline co3ne:Psmooth_iter=0
+# vorpaline co3ne:T12=true
+# vorpaline co3ne:max_N_angle=60
+# vorpaline co3ne:max_hole_area=5%
+# vorpaline co3ne:max_hole_edges=500
+# vorpaline co3ne:min_comp_area=0.01%
+# vorpaline co3ne:min_comp_facets=10
+# vorpaline co3ne:nb_neighbors=30
+# vorpaline co3ne:radius=5%
+# vorpaline co3ne:repair=true
+# vorpaline co3ne:strict=false
+# vorpaline co3ne:use_normals=true
+# vorpaline debug=false
+# vorpaline gel=Lua
+# vorpaline gel:F10_script=
+# vorpaline gel:F1_script=
+# vorpaline gel:F2_script=
+# vorpaline gel:F3_script=
+# vorpaline gel:F4_script=
+# vorpaline gel:F5_script=
+# vorpaline gel:F6_script=
+# vorpaline gel:F7_script=
+# vorpaline gel:F8_script=
+# vorpaline gel:F9_script=
+# vorpaline gel:startup_files=
+# vorpaline gfx:GLSL=true
+# vorpaline gfx:GLSL_tesselation=true
+# vorpaline gfx:GLSL_version=0
+# vorpaline gfx:GLUP_profile=auto
+# vorpaline gfx:GL_debug=false
+# vorpaline gfx:GL_profile=compatibility
+# vorpaline gfx:GL_version=0
+# vorpaline gfx:default_full_screen_effect=Plain
+# vorpaline gfx:full_screen=false
+# vorpaline gfx:geometry=800x800
+# vorpaline gfx:no_decoration=false
+# vorpaline gfx:perspective=false
+# vorpaline gfx:transparent=false
+# vorpaline gui:font_size=18
+# vorpaline gui:mode=legacy
+# vorpaline gui:style=Light
+# vorpaline gui:tooltips=true
+# vorpaline hex=false
+# vorpaline hex:PGP_FF_fixed_topo=1
+# vorpaline hex:PGP_FF_free_topo=1
+# vorpaline hex:PGP_direct_solver=false
+# vorpaline hex:PGP_max_corr_prop=0.34999999999999998
+# vorpaline hex:algo=PGP3d
+# vorpaline hex:border_max_distance=20%
+# vorpaline hex:border_refine=false
+# vorpaline hex:constrained=true
+# vorpaline hex:frames_file=
+# vorpaline hex:keep_border=false
+# vorpaline hex:points_file=
+# vorpaline hex:prefer_seeds=true
+# vorpaline hex:prisms=false
+# vorpaline hex:pyramids=false
+# vorpaline hex:save_frames=false
+# vorpaline hex:save_points=false
+# vorpaline hex:save_surface=false
+# vorpaline hex:save_tets=false
+# vorpaline hex:tets_file=
+# vorpaline interactive=false
+# vorpaline log:features=*
+# vorpaline log:features_exclude=
+# vorpaline log:file_name=
+# vorpaline log:pretty=true
+# vorpaline log:quiet=false
+# vorpaline main=lib/graphite_imgui.lua
+# vorpaline modules=
+# vorpaline nl:CUDA=false
+# vorpaline nl:MKL=false
+# vorpaline opt:Newton_m=7
+# vorpaline opt:nb_Lloyd_iter=5
+# vorpaline opt:nb_LpCVT_iter=30
+# vorpaline opt:nb_Newton_iter=30
+# vorpaline poisson:octree_depth=8
+# vorpaline post=true
+# vorpaline post:compute_normals=false
+# vorpaline post:isect=false
+# vorpaline post:max_deg3_dist=0.10000000000000001%
+# vorpaline post:max_hole_area=0%
+# vorpaline post:max_hole_edges=2000
+# vorpaline post:min_comp_area=0%
+# vorpaline post:repair=false
+# vorpaline pre=true
+# vorpaline pre:Nsmooth_iter=1
+# vorpaline pre:brutal_kill_borders=0
+# vorpaline pre:epsilon=0%
+# vorpaline pre:margin=0%
+# vorpaline pre:max_hole_area=0%
+# vorpaline pre:max_hole_edges=2000
+# vorpaline pre:min_comp_area=0%
+# vorpaline pre:repair=false
+# vorpaline pre:vcluster_bins=0
+# vorpaline profile=scan
+# vorpaline remesh=true
+# vorpaline remesh:Nfactor=5
+# vorpaline remesh:RVC_centroids=true
+# vorpaline remesh:anisotropy=0
+# vorpaline remesh:by_parts=false
+# vorpaline remesh:gradation=0
+# vorpaline remesh:lfs_samples=10000
+# vorpaline remesh:max_dist=0.20000000000000001
+# vorpaline remesh:multi_nerve=true
+# vorpaline remesh:nb_pts=30000
+# vorpaline remesh:refine=false
+# vorpaline remesh:sharp_edges=false
+# vorpaline shell=false
+# vorpaline skin=skin_imgui
+# vorpaline stat:sampling_step=0.5%
+# vorpaline sys:FPE=false
+# vorpaline sys:assert=abort
+# vorpaline sys:cancel=false
+# vorpaline sys:compression_level=3
+# vorpaline sys:lowmem=false
+# vorpaline sys:max_threads=4
+# vorpaline sys:multithread=true
+# vorpaline sys:stats=false
+# vorpaline sys:use_doubles=false
+# vorpaline tet=false
+# vorpaline tet:preprocess=true
+# vorpaline tet:quality=2
+# vorpaline tet:refine=true
+v 0.984415 0.197785 0.0294318 
+v 1 0.195779 0.0182476 
+v 0.974604 0.196341 0.016034 
+v 0.954789 0.196758 0.0160562 
+v 0.990892 0.195008 0.0091245 
+v 0.981784 0.194266 0 
+v 1 0.193623 0 
+v 0.963559 0.194681 0 
+v 0.945334 0.194979 0 
+v 0.936231 0.196978 0.0159041 
+v 0.945274 0.199131 0.0319173 
+v 0.927105 0.195111 0 
+v 0.917978 0.197098 0.0158874 
+v 0.908875 0.195052 0 
+v 0.927012 0.1994 0.0319339 
+v 0.908755 0.199648 0.0316843 
+v 0.890373 0.20008 0.0316371 
+v 0.848837 0.202874 0.031245 
+v 0.81462 0.205601 0.0306274 
+v 0.804084 0.204429 0.0175412 
+v 0.78701 0.205886 0.0163951 
+v 0.819211 0.201491 0.00731219 
+v 0.832721 0.202249 0.0199185 
+v 0.799493 0.202546 0 
+v 0.817824 0.200823 0 
+v 0.836128 0.198835 0 
+v 0.846993 0.199797 0.0130118 
+v 0.85427 0.19708 0 
+v 0.863271 0.198771 0.0155426 
+v 0.871024 0.201119 0.0315363 
+v 0.881353 0.197623 0.0158463 
+v 0.899721 0.197209 0.0158796 
+v 0.890646 0.194993 0 
+v 0.872425 0.195488 0 
+v 0.781176 0.204388 0 
+v 0.771619 0.207031 0.0138472 
+v 0.773066 0.209305 0.0319025 
+v 0.762877 0.206398 0 
+v 0.75419 0.209439 0.0190308 
+v 0.744587 0.208522 0 
+v 0.735932 0.210976 0.0147237 
+v 0.72632 0.210791 0 
+v 0.718225 0.21352 0.0190794 
+v 0.708095 0.21341 0 
+v 0.698807 0.216019 0.015911 
+v 0.704928 0.216136 0.0299542 
+v 0.689931 0.216388 0 
+v 0.681072 0.21894 0.0159365 
+v 0.690032 0.218412 0.0311563 
+v 0.671812 0.219655 0 
+v 0.663148 0.222287 0.0160428 
+v 0.653735 0.223141 0 
+v 0.67282 0.221409 0.0320712 
+v 0.65514 0.224982 0.0320897 
+v 0.645149 0.22597 0.0159808 
+v 0.637073 0.228876 0.0317365 
+v 0.618237 0.232985 0.0316524 
+v 0.59924 0.236791 0.0307735 
+v 0.627045 0.229831 0.0159129 
+v 0.60875 0.23359 0.0157635 
+v 0.63569 0.226804 0 
+v 0.617655 0.230498 0 
+v 0.599601 0.234104 0 
+v 0.590313 0.237216 0.0153756 
+v 0.581533 0.237627 0 
+v 0.572296 0.240792 0.0153909 
+v 0.581066 0.240369 0.0298197 
+v 0.563484 0.241263 0 
+v 0.554538 0.244205 0.0157349 
+v 0.56353 0.243759 0.0307439 
+v 0.545379 0.244607 0 
+v 0.53653 0.247329 0.0158676 
+v 0.545749 0.246997 0.0313125 
+v 0.527191 0.247445 0 
+v 0.518448 0.249995 0.0161445 
+v 0.527982 0.249988 0.0316681 
+v 0.508906 0.249563 0 
+v 0.500344 0.252295 0.0171806 
+v 0.490598 0.251522 0 
+v 0.482049 0.254945 0.0173364 
+v 0.463755 0.257888 0.0164404 
+v 0.472364 0.254041 0 
+v 0.45418 0.256938 0 
+v 0.445535 0.26145 0.0167871 
+v 0.436071 0.260252 0 
+v 0.42725 0.264674 0.0164112 
+v 0.417915 0.268401 0.0297346 
+v 0.417903 0.263217 0 
+v 0.409212 0.267165 0.0156803 
+v 0.399674 0.265788 0 
+v 0.39104 0.269356 0.0157737 
+v 0.401387 0.270491 0.0314018 
+v 0.381393 0.267964 0 
+v 0.372599 0.271254 0.0158283 
+v 0.382565 0.272339 0.0316269 
+v 0.363095 0.269996 0 
+v 0.354149 0.27304 0.015837 
+v 0.344768 0.271737 0 
+v 0.363634 0.273806 0.0317319 
+v 0.344994 0.274891 0.03162 
+v 0.335696 0.274388 0.0158639 
+v 0.326505 0.275293 0.0318604 
+v 0.326404 0.273039 0 
+v 0.31719 0.274971 0.0158333 
+v 0.308007 0.273633 0 
+v 0.307764 0.274254 0.032062 
+v 0.298839 0.274019 0.015899 
+v 0.289478 0.272277 0.0318965 
+v 0.280822 0.27027 0.0160359 
+v 0.27123 0.271257 0.0316528 
+v 0.289701 0.272187 0 
+v 0.272121 0.266874 0 
+v 0.262789 0.266415 0.0161602 
+v 0.254374 0.262474 0 
+v 0.243711 0.267466 0.0153904 
+v 0.251911 0.271846 0.030749 
+v 0.236082 0.264041 0 
+v 0.227385 0.269391 0.0126484 
+v 0.228597 0.27394 0.0290901 
+v 0.218024 0.267624 0 
+v 0.211884 0.272231 0.0152462 
+v 0.199918 0.270944 0 
+v 0.206726 0.276314 0.0316177 
+v 0.193958 0.2748 0.0162374 
+v 0.175925 0.277341 0.0192703 
+v 0.181706 0.273634 0 
+v 0.161798 0.277634 0.00762241 
+v 0.15796 0.279286 0.0262269 
+v 0.163511 0.276434 0 
+v 0.145241 0.278701 0 
+v 0.139843 0.28024 0.0162689 
+v 0.127127 0.280053 0 
+v 0.12774 0.281563 0.0320597 
+v 0.109181 0.282699 0.0319778 
+v 0.118641 0.281848 0.0159887 
+v 0.0999732 0.282184 0.0159716 
+v 0.108995 0.281108 0 
+v 0.0908478 0.282808 0.0319852 
+v 0.081739 0.282095 0.0159905 
+v 0.0725826 0.282754 0.0320347 
+v 0.0908297 0.28105 0 
+v 0.0726639 0.280873 0 
+v 0.0634909 0.281956 0.0160987 
+v 0.0544972 0.280942 0 
+v 0.0446654 0.281927 0.016696 
+v 0.036331 0.281033 0 
+v 0.0249087 0.28196 0.0168056 
+v 0.0181652 0.281199 0 
+v 0.00908276 0.281735 0.0093062 
+v 0.0150768 0.282538 0.0306163 
+v 4.7971e-08 0.281438 0 
+v 4.7971e-08 0.282232 0.0186152 
+f 126 127 129 
+f 14 32 33 
+f 3 6 5 
+f 8 3 4 
+f 13 15 16 
+f 90 89 91 
+f 74 75 77 
+f 9 8 4 
+f 42 40 41 
+f 81 84 83 
+f 41 40 39 
+f 151 149 152 
+f 9 10 12 
+f 65 63 64 
+f 127 131 130 
+f 39 38 36 
+f 69 68 66 
+f 51 52 50 
+f 152 149 150 
+f 24 21 35 
+f 3 5 1 
+f 9 4 10 
+f 2 1 5 
+f 6 7 5 
+f 8 6 3 
+f 4 11 10 
+f 10 13 12 
+f 12 13 14 
+f 10 15 13 
+f 10 11 15 
+f 61 59 62 
+f 151 148 149 
+f 148 146 147 
+f 87 92 89 
+f 109 107 108 
+f 120 121 122 
+f 86 87 89 
+f 20 22 19 
+f 19 22 23 
+f 24 22 20 
+f 24 20 21 
+f 25 22 24 
+f 25 26 22 
+f 22 26 23 
+f 23 26 27 
+f 27 26 28 
+f 23 27 18 
+f 18 27 29 
+f 29 27 28 
+f 30 18 29 
+f 29 31 30 
+f 17 30 31 
+f 32 17 31 
+f 32 31 33 
+f 16 17 32 
+f 13 16 32 
+f 134 135 133 
+f 14 13 32 
+f 33 31 34 
+f 31 29 34 
+f 121 123 124 
+f 28 34 29 
+f 36 35 21 
+f 37 36 21 
+f 104 105 103 
+f 51 55 52 
+f 38 35 36 
+f 37 39 36 
+f 40 38 39 
+f 69 73 72 
+f 42 41 43 
+f 44 42 43 
+f 45 44 43 
+f 45 43 46 
+f 47 44 45 
+f 47 45 48 
+f 48 45 49 
+f 50 47 48 
+f 48 51 50 
+f 53 51 48 
+f 48 49 53 
+f 53 54 51 
+f 75 78 77 
+f 54 55 51 
+f 59 56 57 
+f 59 57 60 
+f 55 56 59 
+f 61 55 59 
+f 54 56 55 
+f 55 61 52 
+f 62 59 60 
+f 62 60 63 
+f 64 63 60 
+f 64 60 58 
+f 65 64 66 
+f 66 64 67 
+f 66 68 65 
+f 70 69 66 
+f 68 69 71 
+f 71 69 72 
+f 71 72 74 
+f 74 72 75 
+f 72 76 75 
+f 79 77 78 
+f 85 86 88 
+f 78 80 79 
+f 80 82 79 
+f 81 82 80 
+f 81 83 82 
+f 84 85 83 
+f 85 84 86 
+f 88 86 89 
+f 107 105 104 
+f 88 89 90 
+f 92 91 89 
+f 90 91 93 
+f 93 91 94 
+f 95 94 91 
+f 93 94 96 
+f 94 97 96 
+f 97 98 96 
+f 99 97 94 
+f 95 99 94 
+f 100 97 99 
+f 97 100 101 
+f 100 102 101 
+f 101 98 97 
+f 101 103 98 
+f 101 104 103 
+f 102 104 101 
+f 106 104 102 
+f 106 107 104 
+f 108 107 106 
+f 109 108 110 
+f 107 109 111 
+f 121 124 122 
+f 109 112 111 
+f 107 111 105 
+f 113 112 109 
+f 109 110 113 
+f 112 113 114 
+f 114 113 115 
+f 113 116 115 
+f 114 115 117 
+f 117 115 118 
+f 119 118 115 
+f 117 118 120 
+f 118 121 120 
+f 118 119 121 
+f 119 123 121 
+f 124 125 126 
+f 126 125 127 
+f 122 124 126 
+f 127 125 128 
+f 129 127 130 
+f 131 132 130 
+f 127 128 131 
+f 133 135 131 
+f 134 136 135 
+f 136 137 135 
+f 138 136 134 
+f 139 136 138 
+f 139 138 140 
+f 136 139 141 
+f 139 142 141 
+f 136 141 137 
+f 143 142 139 
+f 143 139 140 
+f 144 142 143 
+f 145 144 143 
+f 146 144 145 
+f 146 145 147 
+f 148 147 149 
+f 147 150 149 
+f 135 137 132 
+f 131 135 132 
+f 49 45 46 
+f 64 58 67 
+f 67 70 66 
+f 69 70 73 
+f 73 76 72 
+f 5 7 2 
+f 95 91 92 
+f 110 116 113 
+f 116 119 115 
+f 57 58 60 

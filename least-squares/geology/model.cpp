@@ -112,11 +112,11 @@ std::ostream& operator<<(std::ostream& out, Model &m) {
         out << "v " << m.point(i) << std::endl;
     }
     for (int i=0; i<m.nfaces(); i++) {
-//      bool flag = true;
-//      for (int k=0; k<3; k++) {
-//          flag &= (m.point(m.vert(i,k)).y<=4000.+1e-2);
-//      }
-//      if (!flag) continue;
+//    bool flag = true;
+//    for (int k=0; k<3; k++) {
+//        flag &= (m.point(m.vert(i,k)).y<=-7392.96+1e-2);
+//    }
+//    if (!flag) continue;
 
         out << "f ";
         for (int k=0; k<3; k++) {

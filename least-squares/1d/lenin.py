@@ -17,32 +17,32 @@ for i in range(0,n):
     cy[i] = cy[i] - by
 
 lines = [ax.plot(x, y)[0], ax.text(0.05, 0.05, "Iteration #0", transform=ax.transAxes, fontsize=14,bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5)), ax.plot(x, y)[0] ]
+ax.set_aspect('equal', 'datalim')
 
 def animate(iteration):
     global x, y
     print(iteration)
 
+    localiter = 1
     if (iteration>100):
-        for iter in range(0,10):
-            for i in range(0,n):
-                x[i] = (x[(i-1+n)%n]+x[(i+1)%n])/2. + 0.*cx[i] # play with the coeff here, 0. by default
-                y[i] = (y[(i-1+n)%n]+y[(i+1)%n])/2. + 0.*cy[i]
-    else:
+       localiter = 10
+
+    for iter in range(0,localiter):
         for i in range(0,n):
-            x[i] = (x[(i-1+n)%n]+x[(i+1)%n])/2. + 0.*cx[i] # play with the coeff here, 0. by default
-            y[i] = (y[(i-1+n)%n]+y[(i+1)%n])/2. + 0.*cy[i]
+            x[i] = (x[(i-1+n)%n]+x[(i+1)%n])/2. + 2.*cx[i] # play with the coeff here, 0. by default
+            y[i] = (y[(i-1+n)%n]+y[(i+1)%n])/2. + 2.*cy[i]
 
     lines[0].set_data(x, y)  # update the data.
     i = iteration
     if (iteration>100):
         i = (i-100)*10+100
-    lines[1].set_text("Iteration #" + str(i) +" of " + str((200-100)*10+100))
+    lines[1].set_text("Iteration #" + str(i) +" out of " + str((190-100)*10+100))
     plt.draw()
     ax.relim()
     ax.autoscale_view(False,True,True)
     return lines
 
-ani = animation.FuncAnimation(fig, animate, frames=np.arange(0, 200), interval=1, blit=False, save_count=50)
+ani = animation.FuncAnimation(fig, animate, frames=np.arange(0, 190), interval=1, blit=False, save_count=50)
 ani.save('line.gif', dpi=80, writer='imagemagick')
 plt.show()
 

@@ -13,7 +13,10 @@ const TGAColor red    (255,   0,   0, 255);
 const TGAColor blue   (  0,   0, 255, 255);
 const TGAColor yellow (255, 255,   0, 255);
 const TGAColor magenta(255,   0, 255, 255);
-const TGAColor colors[] = {green, blue, yellow, magenta};
+const TGAColor teal   ( 23, 167, 137, 255);
+const TGAColor brown  (160,  64,   0, 255);
+
+const TGAColor colors[] = {green, blue, yellow, magenta, teal, brown};
 const int ncolors = sizeof(colors)/sizeof(TGAColor);
 
 
@@ -34,6 +37,30 @@ int main(int argc, char** argv) {
         std::cerr << "Usage: " << argv[0] << " obj/model.obj" << std::endl;
         return 1;
     }
+
+
+#if 0
+    {
+        std::vector<Model> m;
+        for (int i=1; i<argc; i++) {
+            m.push_back(Model(argv[i]));
+        }
+        Vec3f min, max;
+        m[0].get_bbox(min, max);
+        float maxside = std::max(max.x-min.x, std::max(max.y-min.y, max.z-min.z));
+        for (int i=0; i<(int)m.size(); i++) {
+            std::cout << "= " << argv[1+i] << std::endl;
+            for (int v=0; v<m[i].nverts(); v++) {
+                Vec3f p = m[i].point(v);
+                p  = (p - min)/maxside;
+                m[i].point(v) = Vec3f(p.x, p.z, p.y);
+            }
+            std::cout << m[i];
+        }
+    }
+    return 0;
+#endif
+
 
     std::vector<Model> m;
     for (int i=1; i<argc; i++) {
@@ -105,7 +132,7 @@ int main(int argc, char** argv) {
             }
             float dot = (m[0].point(v2)-m[0].point(v1)).normalize()*Vec3f(0,1,0);
             if (m[0].opp(i)<0 && fabs(dot)>0.99) {
-                float scale = .3;
+                float scale = 30;
                 nlBegin(NL_ROW);
                 nlCoefficient(v1,  scale);
                 nlRightHandSide(dot>0?scale:0);
@@ -202,6 +229,7 @@ int main(int argc, char** argv) {
         }
     }
 
+
     // draw the mesh
 
     TGAImage frame(width, height, TGAImage::RGB);
@@ -221,7 +249,7 @@ int main(int argc, char** argv) {
     }
 
     frame.write_tga_file("framebuffer.tga");
-    std::cout << m[0];
+//    std::cout << m[0];
     return 0;
 }
 

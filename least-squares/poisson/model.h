@@ -8,6 +8,7 @@ class Model {
 private:
     std::vector<Vec3f> verts;
     std::vector<Vec3i> faces;
+<<<<<<< HEAD
     std::vector<std::vector<int> > v2h;    // vertex to halfedge incidency
     std::vector<int> opposites;            // halfedges
     void compute_opposites();             
@@ -28,6 +29,29 @@ public:
     int opp(int hid);                      // opposite halfedge or -1 if it does not exist
     int next(int hid);                     // next halfedge in the triangle
     int prev(int hid);                     // previous halfedge in the triangle, prev(hid) = next(next(hid))
+=======
+    std::vector<std::vector<int> > v2h; // vertex to halfedge incidency
+    std::vector<int> opposites; // halfedges
+    void compute_opposites();
+public:
+    Model(const char *filename);
+
+    int nverts();
+    int nfaces();
+    int nhalfedges();
+
+    Vec3f &point(int i);
+    int vert(int fi, int li);
+    void get_bbox(Vec3f &min, Vec3f &max);
+    void print_obj();
+
+    int first_halfedge(int vid);
+    int from(int hid);
+    int to(int hid);
+    int opp(int hid);
+    int next(int hid);
+    int prev(int hid);
+>>>>>>> 5658407f865ebae7292d1feeac1b790a57c5cabf
 };
 
 std::ostream& operator<<(std::ostream& out, Model &m);

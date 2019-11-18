@@ -85,6 +85,9 @@ int Model::nfaces() {
 int Model::nhalfedges() {
     return faces.size()*3;
 }
+std::vector<int> &Model::incident_halfedges(int v) {
+    return v2h[v];
+}
 
 void Model::get_bbox(Vec3f &min, Vec3f &max) {
     min = max = verts[0];

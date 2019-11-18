@@ -5,20 +5,6 @@
 #include "geometry.h"
 #include "model.h"
 
-const Vec3f axes[] = {Vec3f(1,0,0), Vec3f(-1,0,0), Vec3f(0,1,0), Vec3f(0,-1,0), Vec3f(0,0,1), Vec3f(0,0,-1)};
-int snap(Vec3f n) { // return s the coordinate axis closest to the given normal
-    double nmin = -2.0;
-    int    imin = -1;
-    for (int i=0; i<6; i++) {
-        double t = n*axes[i];
-        if (t>nmin) {
-            nmin = t;
-            imin = i;
-        }
-    }
-    return imin;
-}
-
 int main(int argc, char** argv) {
     if (argc<2) {
         std::cerr << "Usage: " << argv[0] << " obj/model.obj" << std::endl;
@@ -27,14 +13,6 @@ int main(int argc, char** argv) {
 
     Model m(argv[1]);
 
-    std::vector<int> nearest_axis(m.nfaces());
-    for (int i=0; i<m.nfaces(); i++) {
-        Vec3f v[3];
-        for (int j=0; j<3; j++) v[j] = m.point(m.vert(i, j));
-        Vec3f n = cross(v[1]-v[0], v[2]-v[0]).normalize();
-        nearest_axis[i] = snap(n);
-    }
-
     for (int d=0; d<3; d++) { // solve for x, y and z separately
         nlNewContext();
         nlSolverParameteri(NL_NB_VARIABLES, m.nverts());
@@ -42,7 +20,18 @@ int main(int argc, char** argv) {
         nlBegin(NL_SYSTEM);
         nlBegin(NL_MATRIX);
 
-        for (int i=0; i<m.nhalfedges(); i++) {
+        for (int i=0; i<m.nhalfedges(); i++) { // fix the boundary vertices
+            if (m.opp(i)!=-1) continue;
+            int v = m.from(i);
+            nlRowScaling(10.);
+            nlBegin(NL_ROW);
+            nlCoefficient(v,  1);
+            nlRightHandSide(m.point(v)[d]);
+            nlEnd(NL_ROW);
+        }
+
+        for (int i=0; i<m.nhalfedges(); i++) { // keep the original geometry for the interior
+            if (m.opp(i)==-1) continue;
             int v1 = m.from(i);
             int v2 = m.to(i);
 
@@ -52,11 +41,14 @@ int main(int argc, char** argv) {
             nlCoefficient(v2, -1);
             nlRightHandSide(m.point(v1)[d] - m.point(v2)[d]);
             nlEnd(NL_ROW);
+        }
 
-            int axis = nearest_axis[i/3]/2;
-            if (d!=axis) continue;
+        for (int i=0; i<m.nhalfedges(); i++) { // smooth the interior
+            if (m.opp(i)==-1) continue;
+            int v1 = m.from(i);
+            int v2 = m.to(i);
 
-            nlRowScaling(2.);
+            nlRowScaling(1.);
             nlBegin(NL_ROW);
             nlCoefficient(v1,  1);
             nlCoefficient(v2, -1);

@@ -1,98 +1,169 @@
-\documentclass[A4,11pt]{article}
+\documentclass{article}
+
+\usepackage[vmarginratio=1:1,a4paper,body={6.5in, 9.5in}]{geometry}
 
 \usepackage[T2A]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage[russian]{babel}
 
+\usepackage{color}
 
-\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{amsmath}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\newtheorem{theorem}{Theorem}
+\newtheorem{definition}{Definition}
+
+\usepackage{hyperref}
+\usepackage{graphicx}
+\graphicspath{{./img/}}
 
 
 \begin{document}
-Кратко о наименьших квадратах
+\section{Is probability theory well-founded or do you believe in the theory of evolution?}
 
-Полтора года назад я опубликовал статью «Математика на пальцах: методы наименьших квадратов»,
-https://habr.com/post/277275/
-которая получила весьма приличный отклик,
-который, в том числе, заключался в том, что я предложил нарисовать сову.
-Раз сова, значит, нужно объяснять ещё раз. А через неделю ровно на эту тему я начну читать несколько лекций студентам-геологам;
-пользуюсь случаем, излагаю тут (адаптированные) основные тезисы в качестве черновика.
-Я разобью текст на (наверное) три статьи:
-- Ликбез по теорвер
-- Наименьшие квадраты, простейший случай
-- Нелинейные МНК
-Основная идея
+I’ll start with the least squares methods through the maximum likelihood estimation;
+this requires some (at least superficial) knowledge of probability theory. 
 
-
-Я зайду к наименьшим квадратам чуть сбоку, через принцип максимума правдоподобности, а он требует минимального ориентирования в теории вероятностей.
-Данный текст рассчитан на третий курс нашего факультета геологии, что означает, (с точки зрения задействованного матаппарата!) что заинтересованный старшеклассник 
-при соответствующем усердии должен суметь в нём разобраться.
-
-\section{Ликбез по теории вероятностей}
-\subsection{Верите ли вы в теорию эволюции?}
-Однажды мне задали вопрос, верю ли я в теорию эволюции. Прямо сейчас сделайте паузу, подумайте, как вы на него ответите.
-
-Лично я (опешив) ответил, что нахожу её правдоподобной. Научная теория имеет мало общего с верой.
-Если кратко, то теория лишь строит модель окружающего нас мира, нет необходимости в неё верить.
-Состоятельная теория должна обладать, в первую очередь, предсказательной силой.
-Например, если вы генетически модифицируете сельскохозяйственные культуры таким образом, что они сами будут производить пестициды,
-то вполне логично, что будут появляться устойчивые к ним насекомые.
-Однако существенно менее очевидно, что этот процесс может быть замедлен благодаря выращиванию обычных растений бок-о-бок с генномодифицированными.
-Основываясь на теории эволюции, соответствующее моделирование сделало такой прогноз,
-
-https://www.sciencedirect.com/science/article/pii/S0167880903002858?via%3Dihub
-
-и он, похоже, оправдался.
-
-https://www.nature.com/articles/nbt1382
+I was once asked if I believed in evolutionary theory. 
+Take a short break, think about how you would answer.
+Being puzzled by the question, I have answered that I find it plausible. 
+Scientific theory has little to do with faith.
+In short, a theory only builds a model of the world, and there is no need to believe in it.
+Moreover, the Popperian criterion\cite{} requires a scientific theory be able to be falsifiable. 
+A solid theory must possess, first of all, the power of prediction.
+For example, if you genetically modify crops in such a way that they produce pesticides themselves, 
+it is only logical that pesticide-resistant insects would appear. 
+However, it is much less obvious that this process can be slowed down by growing regular plants side by side with genetically modified plants. 
+Based on evolutionary theory, the corresponding modelling has made this prediction\cite{}, and it seems to have been validated\cite{}.
 
 
-
-Теории бывают самыми разными и 
-
-
-Дальше, конечно, можно углубляться в философию
-
-
-
-Фреквентисты,
-Qu'est-ce qui se passe si on les respecte pas?
-
-чемпионат мира: уругвай=a германия=b
-
-\begin{alignat*}{2}
-P(a) = .4 & \qquad & P(a\wedge b) = 0 \\
-P(b) = .3 &        & P(a\vee b) = .8
-\end{alignat*}
-%$P(a) = .4  \qquad  P(a\wedge b) = 0 \qquad P(b) = .3 \qquad P(a\vee b) = .8$
+$$P(a) = .4  \qquad  P(a\wedge b) = 0 \qquad P(b) = .3 \qquad P(a\vee b) = .8$$
+	
 \begin{tabular}{cccccc}
-\multicolumn{2}{c}{Ставки Агента 2}  &  \multicolumn{4}{c}{Результат для Агента 1} \\
-\hline
-{\tiny Событие} & {\tiny Сумма ставки} & {\tiny $a\wedge b$} & {\tiny $a\wedge \neg b$} &  {\tiny $\neg a\wedge b$} &  {\tiny $\neg a\wedge\neg b$} \\
-\hline
-$a$             & 4-6 & -6 & -6 &  4 &  4 \\
-$b$             & 3-7 & -7 &  3 & -7 &  3 \\
-$\neg(a\vee b)$ & 2-8 &  2 &  2 &  2 & -8 \\
-\hline
-                &     &-11 & -1 & -1 & -1
+	\multicolumn{2}{c}{Bets of the Agent 2}  &  \multicolumn{4}{c}{Result for the Agent 1} \\
+	\hline
+	{\tiny Event} & {\tiny Bet amount} & {\tiny $a\wedge b$} & {\tiny $a\wedge \neg b$} &  {\tiny $\neg a\wedge b$} &  {\tiny $\neg a\wedge\neg b$} \\
+	\hline
+	$a$             & 4-6 & -6 & -6 &  4 &  4 \\
+	$b$             & 3-7 & -7 &  3 & -7 &  3 \\
+	$\neg(a\vee b)$ & 2-8 &  2 &  2 &  2 & -8 \\
+	\hline
+	&     &-11 & -1 & -1 & -1
 \end{tabular}
-
-Агент 1 теряет деньги при любом раскладе!
-
-\subsection{Что изучает теорвер}
-
-Il y a 3 axiomes de Kolmogorov :
+	
 \begin{itemize}
-\item $0\leq P(a)\leq 1$
-\item $P(true)=1$, $P(false) = 0$
-\item $P(a\vee b) = P(a) + P(b) - P(a\wedge b)$
+	\item $0\leq P(a)\leq 1$
+	\item $P(true)=1$, $P(false) = 0$
+	\item $P(a\vee b) = P(a) + P(b) - P(a\wedge b)$
 \end{itemize}
 
-\subsection{Плотность вероятности}
 
-\subsection{Условная вероятность}
+$$
+P(k;n,p) = C_n^k p^k (1-p)^{n-k}
+$$
 
-\subsection{Правдоподобие}
+$$P(k) = C_{10}^k \frac{1}{2^k}\left(1-\frac{1}{2}\right)^{n-k} = \frac{C_{10}^k}{2^n}$$
+
+$$\mathcal{L}(p) = C_{10}^7 p^7 (1-p)^3$$
+
+$$\log \mathcal{L}(p) = \log C_{10}^7 + 7 \log p + 3\log (1-p)$$
+
+$$\frac{d \log \mathcal{L}}{dp} = 0$$
+
+$$\frac{d \log \mathcal{L}}{dp} = \frac{7}{p} - \frac{3}{1-p} = 0$$
+
+$p=0.7$
+
+$$\frac{d^2 \log \mathcal{L}}{dp^2} = -\frac{7}{p^2} - \frac{3}{(1-p)^2}$$
+
+$$\frac{d^2 \log \mathcal{L}}{dp^2}(0.7)  \approx -48 < 0$$
+
+$$
+\{U_j\}_{j=1}^{N}
+$$
+
+$$
+p(U_j) = \frac{1}{\sqrt{2\pi}\sigma} \exp\left(-\frac{(U_j-U)^2}{2\sigma^2}\right)
+$$
+
+
+\begin{align*}
+\log \mathcal{L}(U,\sigma) & = \log \left(\prod\limits_{j=1}^N  \frac{1}{\sqrt{2\pi}\sigma} \exp\left(-\frac{(U_j-U)^2}{2\sigma^2}\right)\right) =\\
+& = \sum\limits_{j=1}^N \log \left(\frac{1}{\sqrt{2\pi}\sigma} \exp\left(-\frac{(U_j-U)^2}{2\sigma^2}\right)\right) = \\
+& = \sum\limits_{j=1}^N \left(\log \left(\frac{1}{\sqrt{2\pi}\sigma}\right) -\frac{(U_j-U)^2}{2\sigma^2}\right) = \\
+& = -N \left(\log\sqrt{2\pi} + \log\sigma\right) - \frac{1}{2\sigma^2} \sum\limits_{j=1}^N (U_j-U)^2
+\end{align*}
+
+
+$$
+\frac{\partial\log\mathcal{L}}{\partial U}    =  \frac{1}{\sigma^2}\sum\limits_{j=1}^N (U_j-U) = 0 
+$$
+
+$$
+U = \frac{\sum\limits_{j=1}^N U_j}{N}
+$$
+
+$$
+\frac{\partial\log\mathcal{L}}{\partial\sigma} =  -\frac{N}{\sigma} + \frac{1}{\sigma^3}\sum\limits_{j=1}^N (U_j-U)^2 = 0
+$$
+
+$$
+\sigma = \sqrt{\frac{\sum\limits_{j=1}^N (U_j-U)^2}{N}} 
+$$
+
+$$
+\{I_j, U_j\}_{j=1}^{N}
+$$
+
+\begin{align*}
+\log \mathcal{L}(R,\sigma) & = \log \left(\prod\limits_{j=1}^N  \frac{1}{\sqrt{2\pi}\sigma} \exp\left(-\frac{(U_j-R I_j)^2}{2\sigma^2}\right)\right) =\\
+& = -N \left(\log\sqrt{2\pi} + \log\sigma\right) - \frac{1}{2\sigma^2} \sum\limits_{j=1}^N (U_j- R I_j)^2
+\end{align*}
+
+\begin{align*}
+\frac{\partial\log\mathcal{L}}{\partial R} &=  -\frac{1}{2\sigma^2}\sum\limits_{j=1}^N -2I_j (U_j- R I_j) = \\
+&= \frac{1}{\sigma^2}\left(\sum\limits_{j=1}^N I_jU_j - R\sum\limits_{j=1}^N I_j^2\right) = 0
+\end{align*}
+
+$$
+R = \frac{\sum\limits_{j=1}^N I_jU_j}{\sum\limits_{j=1}^N I_j^2}
+$$
+
+$$
+\{x_j, y_j\}_{j=1}^{N}
+$$
+
+\begin{align*}
+\log \mathcal{L}(a, b,\sigma) & = \log \left(\prod\limits_{j=1}^N  \frac{1}{\sqrt{2\pi}\sigma} \exp\left(-\frac{(y_j - a x_j - b)^2}{2\sigma^2}\right)\right) =\\
+& = -N \left(\log\sqrt{2\pi} + \log\sigma\right) - \frac{1}{2\sigma^2} \sum\limits_{j=1}^N (y_j- a x_j - b)^2
+\end{align*}
+
+
+$$
+S(a, b) = \sum\limits_{j=1}^N (y_j- a x_j - b)^2
+$$
+
+
+\begin{align*}
+\frac{\partial S}{\partial a} &= \sum\limits_{j=1}^N 2 x_j (a x_j + b - y_j) = 0 \\
+\frac{\partial S}{\partial b} &= \sum\limits_{j=1}^N 2 (a x_j + b - y_j) = 0
+\end{align*}
+
+$$
+\left \{ \begin{array}{r l}
+a \sum\limits_{j=1}^N x_j^2 + b \sum\limits_{j=1}^N x_j  & = \sum\limits_{j=1}^N x_j y_j\\
+a \sum\limits_{j=1}^N x_j   + b N                        & = \sum\limits_{j=1}^N y_j
+\end{array} \right.
+$$
+
+\begin{align*}
+a &= \frac{N \sum\limits_{j=1}^N x_j y_j - \sum\limits_{j=1}^N x_j \sum\limits_{j=1}^N y_j}{N\sum\limits_{j=1}^N x_j^2 - \left(\sum\limits_{j=1}^N x_j\right)^2} \\
+b &= \frac{1}{N}\left(  \sum\limits_{j=1}^N y_j - a  \sum\limits_{j=1}^N x_j \right)
+\end{align*}
 
 
 

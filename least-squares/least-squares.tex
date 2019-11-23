@@ -44,6 +44,17 @@ it is only logical that pesticide-resistant insects would appear.
 However, it is much less obvious that this process can be slowed down by growing regular plants side by side with genetically modified plants. 
 Based on evolutionary theory, the corresponding modelling has made this prediction\cite{}, and it seems to have been validated\cite{}.
 
+\paragraph*{Wait, what is the conection?}
+
+As I mentioned earlier, the idea is to approach the least squares through the principle of maximum likelihood. 
+Let us illustrate by example. 
+Suppose we are interested in penguins body height, but we are only able to measure a few of these magestic birds.
+It is reasonable to introduce the body height distribution model into the task; most often it is supposed to be normal.
+A normal distribution is characterized by two parameters: the average value and the standard deviation.
+For each fixed value of parameters, we can calculate the probability that the measurements we made would be generated.
+Then, by varying the parameters, we will find those that maximize the probability.
+
+
 
 $$P(a) = .4  \qquad  P(a\wedge b) = 0 \qquad P(b) = .3 \qquad P(a\vee b) = .8$$
 	
@@ -264,26 +275,45 @@ Note that if we take one hundred measurements with $\approx 1A$ reference curren
 then the first hundred measurements would barely affect the result. Let's remember this fact, we will need it later.
 
 \subsection{Fourth example: back to the least squares}
+You have probably already noticed that in the last two examples, maximizing the logarithm of the likelihood is equivalent to minimizing the sum of squared estimation errors.
+Let us consider one more example.
+Say we want to calibrate a spring scale with a help of reference weights.
+Suppose we have $N$ reference weights of mass $x_j$; we weigh them with the scale and measure the length of the spring.
+So, we have $N$ spring lengths $y_j$:
 $$
 \{x_j, y_j\}_{j=1}^{N}
 $$
 
+Hooke's law tells us that spring stretches linearly on the force applied;
+this force includes the reference weight and the weight of the spring itself. 
+Let us denote the spring stiffness as $a$, and the spring length streched under under its own weight as $b$. 
+Then we can express the plausibility of our measurements (still under the Gaussian measurement noise hypothesis) in this way:
 \begin{align*}
 \log \mathcal{L}(a, b,\sigma) & = \log \left(\prod\limits_{j=1}^N  \frac{1}{\sqrt{2\pi}\sigma} \exp\left(-\frac{(y_j - a x_j - b)^2}{2\sigma^2}\right)\right) =\\
 & = -N \left(\log\sqrt{2\pi} + \log\sigma\right) - \frac{1}{2\sigma^2} \sum\limits_{j=1}^N (y_j- a x_j - b)^2
 \end{align*}
 
-
+Maximizing the likelihood of $\mathcal L$ is equivalent to minimizing the sum of the squared estimation error, i.e., we are looking for the minimum of the function $S$ defined as follows:
 $$
 S(a, b) = \sum\limits_{j=1}^N (y_j- a x_j - b)^2
 $$
 
 
+\begin{figure}[htb!]
+\centering
+\includegraphics[width=.2\columnwidth]{c5aa80f6a2e9575abfa7b3dfdabf5c5a.png}
+\caption{To calibrate the spring scale, we can solve the linear regression problem.}
+\label{fig:regression}
+\end{figure}
+
+Figure~\ref{fig:regression} illustrates the formula: we are looking for such a straight line that minimizes the sum of squared lengths of green segments.
+And then the derivation is quite straightforward:
 \begin{align*}
 \frac{\partial S}{\partial a} &= \sum\limits_{j=1}^N 2 x_j (a x_j + b - y_j) = 0 \\
 \frac{\partial S}{\partial b} &= \sum\limits_{j=1}^N 2 (a x_j + b - y_j) = 0
 \end{align*}
 
+We obtain a system of two linear equations with two unknowns:
 $$
 \left \{ \begin{array}{r l}
 a \sum\limits_{j=1}^N x_j^2 + b \sum\limits_{j=1}^N x_j  & = \sum\limits_{j=1}^N x_j y_j\\
@@ -291,12 +321,21 @@ a \sum\limits_{j=1}^N x_j   + b N                        & = \sum\limits_{j=1}^N
 \end{array} \right.
 $$
 
+Use your favorite method to obtain the following solution:
 \begin{align*}
 a &= \frac{N \sum\limits_{j=1}^N x_j y_j - \sum\limits_{j=1}^N x_j \sum\limits_{j=1}^N y_j}{N\sum\limits_{j=1}^N x_j^2 - \left(\sum\limits_{j=1}^N x_j\right)^2} \\
 b &= \frac{1}{N}\left(  \sum\limits_{j=1}^N y_j - a  \sum\limits_{j=1}^N x_j \right)
 \end{align*}
 
+\subsection{Conclusion}
+The least squares method is a particular case of maximizing likelihood in cases where the probability density is Gaussian.
+If the density is not Gaussian, the least squares approach can produce an estimate different from the MLE (maximum likelihood estimation).
+By the way, Gauss conjectured that the type of noise is of no importance, and the only thing that matters is the independence of trials.
 
+As you have already noticed, the more we parameters we have, the more cumbersome the analytical solutions are.
+Fortunately, we are not living in XVIII century anymore, we have computers!
+Next we will try to build a geometric intuition on least squares, and see how can least squares problems be efficiently implemented.
 
 
 \end{document}
+

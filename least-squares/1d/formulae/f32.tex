@@ -1,0 +1,30 @@
+\documentclass[A4,11pt]{article}
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+\usepackage{amsmath,amssymb,amsfonts}
+\begin{document}
+\thispagestyle{empty}
+
+
+$$
+\left\{
+\begin{array}{cccccccccccccccccl}
+-x_0 & +x_1  &      &      &         &        &            &         &         &         &            &        &            &         &         &         &         &= 0 \\
+     &  -x_1 & +x_2 &      &         &        &            &         &         &         &            &        &            &         &         &         &         &= 0 \\
+     &       &      &      &         & \ddots &            &         &         &         &            &        &            &         &         &         &         &  \vdots   \\
+     &       &      &      &         &        &    -x_{16} & +x_{17} &         &         &            &        &            &         &         &         &         &= 0 \\
+     &       &      &      &         &        &            & -x_{17} & +x_{18} &         &            &        &            &         &         &         &         &= 0 \\
+     &       &      &      &         &        &            &         & -x_{18} & +x_{19} &            &        &            &         &         &         &         &= 0 \\
+     &       &      &      &         &        &            &         &         & -x_{19} & +x_{20}    &        &            &         &         &         &         &= 0 \\
+     &       &      &      &         &        &            &         &         &         &            & \ddots &            &         &         &         &         &  \vdots  \\
+     &       &      &      &         &        &            &         &         &         &            &        &            &         & -x_{29} & +x_{30} &         &= 0 \\
+     &       &      &      &         &        &            &         &         &         &            &        &            &         &         & -x_{30} & +x_{31} &= 0 \\
+100\cdot x_{0}     &       &      &      &         &        &            &         &         &         &            &        &            &         &         &         &  &= 100\cdot 1 \\
+     &       &      &      &         &        &            &         & 100\cdot x_{18} &         &            &        &            &         &         &         &         &= 100\cdot 2 \\
+     &       &      &      &         &        &            &         &         &         &            &        &            &         &         &         & 100\cdot x_{31} &= 100\cdot 1 \\
+\end{array}
+\right.
+$$
+
+\end{document}
